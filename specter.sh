@@ -1,41 +1,62 @@
 #!/bin/bash
-# specter.sh — SPECTER main launcher
+# specter.sh — SPECTER one-command launcher
 #
-# Usage:
-#   ./specter.sh                          # start dashboard (auto stack)
-#   ./specter.sh --stack nvidia           # full NVIDIA stack
-#   ./specter.sh --mode forensics         # forensics documentation mode
-#   ./specter.sh --mode mystery           # Sherlock mystery game mode
-#   ./specter.sh --image-path FILE        # scan a specific image
-#   ./specter.sh init                     # first-time setup wizard
-#   ./specter.sh scan FILE                # one-shot forensics scan
+# First time:  ./specter.sh init
+# Demo:        ./specter.sh
+# NVIDIA mode: ./specter.sh --stack nvidia
 #
+set -e
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 export PYTHONPATH="$SCRIPT_DIR"
 
-# Parse port from args
-PORT=8081  # fixed port — matches cloudflare tunnel config
-
-# Kill anything already on this port
-if command -v lsof &>/dev/null; then
-  OLD=$(lsof -ti:$PORT 2>/dev/null)
-  [ -n "$OLD" ] && echo "   ⚠️  Killing process on :$PORT (pid $OLD)" && kill -9 $OLD 2>/dev/null
+# ── Config check ───────────────────────────────────────────────────────────────
+CONFIG="$HOME/.config/specter/config.yaml"
+if [ ! -f "$CONFIG" ] && [ "$1" != "init" ]; then
+  echo ""
+  echo "  ⚠️  No config found. Run: ./specter.sh init"
+  echo ""
+  exit 1
 fi
-args=("$@")
-for i in "${!args[@]}"; do
-  if [[ "${args[$i]}" == "--port" || "${args[$i]}" == "-p" ]]; then
-    PORT="${args[$((i+1))]}"
-  fi
-done
 
-# Start Cloudflare named tunnel if config exists
+# ── Init wizard ────────────────────────────────────────────────────────────────
+if [ "$1" = "init" ]; then
+  mkdir -p "$HOME/.config/specter"
+  echo ""
+  echo "🔮 SPECTER Setup"
+  echo ""
+  read -p "  Nebius API key: " NEBIUS
+  read -p "  Tavily API key: " TAVILY
+  read -p "  MiniMax API key (optional, press enter to skip): " MINIMAX
+  cat > "$CONFIG" << YAML
+nebius_api_key: $NEBIUS
+tavily_api_key: $TAVILY
+minimax_api_key: $MINIMAX
+stack: nvidia
+port: 8081
+YAML
+  echo ""
+  echo "  ✅ Config saved to $CONFIG"
+  echo "  Run: ./specter.sh"
+  echo ""
+  exit 0
+fi
+
+# ── Port ───────────────────────────────────────────────────────────────────────
+PORT=8081
+for i in "$@"; do [[ "$i" == "--port" ]] && shift && PORT="$1"; done
+
+# Kill old process on port
+fuser -k ${PORT}/tcp 2>/dev/null || lsof -ti:$PORT 2>/dev/null | xargs kill -9 2>/dev/null || true
+sleep 1
+
+# ── Cloudflare tunnel ─────────────────────────────────────────────────────────
 if command -v cloudflared &>/dev/null && [ -f "$HOME/.cloudflared/config.yml" ]; then
-  echo "   🌐 Starting Cloudflare tunnel → specter.charlieverse.io"
   cloudflared tunnel run specter &>/tmp/specter-tunnel.log &
-  sleep 2
+  sleep 1
+  echo "   🌐 https://specter.charlieverse.io"
 fi
 
-# uv run needs -- to separate its own flags from the app's flags
+# ── Launch ─────────────────────────────────────────────────────────────────────
 exec uv run \
   --with fastapi \
   --with "uvicorn[standard]" \

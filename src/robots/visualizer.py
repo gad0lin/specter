@@ -17,8 +17,7 @@ try:
     import rerun as rr
     RERUN_AVAILABLE = True
 except ImportError:
-    RERUN_AVAILABLE = False
-    print("⚠️  rerun-sdk not installed — run: pip install rerun-sdk")
+    RERUN_AVAILABLE = False  # optional — dashboard map works without it
 
 
 # SHACK15 zone positions in 3D (x, z, y=0 floor)

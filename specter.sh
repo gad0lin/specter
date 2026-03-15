@@ -14,7 +14,7 @@ SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 export PYTHONPATH="$SCRIPT_DIR"
 
 # Parse port from args
-PORT=8888
+PORT=8081  # fixed port — matches cloudflare tunnel config
 args=("$@")
 for i in "${!args[@]}"; do
   if [[ "${args[$i]}" == "--port" || "${args[$i]}" == "-p" ]]; then

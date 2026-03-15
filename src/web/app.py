@@ -404,7 +404,7 @@ config:
         """,
     )
     parser.add_argument("command", nargs="?", help="init | scan")
-    parser.add_argument("--port", "-p", type=int, default=int(os.environ.get("PORT", 8888)), help="Port (default: 8888)")
+    parser.add_argument("--port", "-p", type=int, default=int(os.environ.get("PORT", 8081)), help="Port (default: 8081)")
     parser.add_argument("--stack", choices=["nvidia", "hybrid", "auto"], default=None, help="Backend stack preset")
     parser.add_argument("--mode", choices=["mystery", "forensics", "auto"], default="auto", help="Operating mode")
     parser.add_argument("--image-path", metavar="FILE", help="Scan a specific image file")

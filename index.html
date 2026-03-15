@@ -3,7 +3,8 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>SPECTER — Space Perception Engine for Crime, Theater, and Exploration Research</title>
+<title>SPECTER</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 96 96%27><circle cx=%2748%27 cy=%2748%27 r=%2744%27 stroke=%27white%27 stroke-width=%272%27 fill=%27black%27/><path d=%27M12 48 C24 24 72 24 84 48 C72 72 24 72 12 48Z%27 stroke=%27white%27 stroke-width=%272%27 fill=%27none%27/><circle cx=%2748%27 cy=%2748%27 r=%2714%27 stroke=%27white%27 stroke-width=%272%27 fill=%27none%27/><circle cx=%2748%27 cy=%2748%27 r=%275%27 fill=%27white%27/></svg>"/>
 <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <style>
 :root {
@@ -66,10 +67,13 @@ body {
 }
 
 .hero-logo {
-  font-size: 80px;
-  margin-bottom: 16px;
-  display: block;
-  animation: float 4s ease-in-out infinite;
+  margin-bottom: 24px;
+  display: flex;
+  justify-content: center;
+  animation: float 6s ease-in-out infinite;
+}
+.hero-logo svg {
+  filter: drop-shadow(0 0 24px rgba(255,255,255,0.08));
 }
 
 @keyframes float {
@@ -369,7 +373,23 @@ footer a { color: var(--red); text-decoration: none; }
 <!-- HERO -->
 <section class="hero">
   <div class="hero-eyebrow">Nebius.Build SF 2026 · SHACK15</div>
-  <span class="hero-logo">👁</span>
+  <div class="hero-logo">
+    <svg width="96" height="96" viewBox="0 0 96 96" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <!-- outer ring -->
+      <circle cx="48" cy="48" r="44" stroke="white" stroke-width="1.5" opacity="0.15"/>
+      <!-- lens shape -->
+      <path d="M12 48 C24 24 72 24 84 48 C72 72 24 72 12 48Z" stroke="white" stroke-width="1.5" fill="none" opacity="0.6"/>
+      <!-- iris -->
+      <circle cx="48" cy="48" r="14" stroke="white" stroke-width="1.5" fill="none"/>
+      <!-- pupil -->
+      <circle cx="48" cy="48" r="5" fill="white"/>
+      <!-- highlight -->
+      <circle cx="53" cy="43" r="2" fill="white" opacity="0.5"/>
+      <!-- scan lines -->
+      <line x1="12" y1="48" x2="30" y2="48" stroke="white" stroke-width="0.75" opacity="0.3"/>
+      <line x1="66" y1="48" x2="84" y2="48" stroke="white" stroke-width="0.75" opacity="0.3"/>
+    </svg>
+  </div>
   <h1>SPECTER</h1>
   <div class="hero-full">Space Perception Engine for Crime, Theater, and Exploration Research</div>
   <p class="hero-tagline">"Robots that see what humans miss — in a crime scene, a museum, or a mystery game."</p>

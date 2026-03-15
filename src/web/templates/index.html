@@ -257,16 +257,24 @@ body { background:var(--bg); color:var(--text); font-family:'DM Sans',system-ui,
   <div class="sidebar">
     <div class="sidebar-section">
       <div class="sidebar-label">Actions</div>
-      <!-- Step 1: Record space -->
-      <div style="font-size:10px;font-weight:700;letter-spacing:1.5px;color:var(--dim);margin-bottom:6px">STEP 1 — SCAN SPACE</div>
-      <label class="btn btn-primary" style="cursor:pointer;text-align:center;padding:12px;font-size:14px">
+      <!-- Step 1: Location -->
+      <div style="font-size:10px;font-weight:700;letter-spacing:1.5px;color:var(--dim);margin-bottom:6px">STEP 1 — WHERE ARE YOU?</div>
+      <div style="display:flex;gap:6px">
+        <input id="locationInput" class="interact-input" placeholder="e.g. SHACK15, Ferry Building SF" style="flex:1;font-size:13px;padding:9px 12px"/>
+        <button onclick="setLocation()" style="padding:9px 14px;background:var(--accent);color:#fff;border:none;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer">→</button>
+      </div>
+      <div id="locationStatus" style="font-size:11px;color:var(--dim);margin-top:4px;min-height:16px"></div>
+
+      <!-- Step 2: Video -->
+      <div style="font-size:10px;font-weight:700;letter-spacing:1.5px;color:var(--dim);margin-top:14px;margin-bottom:6px">STEP 2 — SCAN SPACE <span style="font-weight:400;color:var(--dim)">(optional)</span></div>
+      <label class="btn btn-outline" style="cursor:pointer;text-align:center;padding:10px;font-size:13px">
         🎥 Upload Space Video
         <input type="file" accept="video/*" style="display:none" onchange="uploadVideo(this)">
       </label>
       <button class="btn btn-outline" onclick="doScan()" style="margin-top:6px;font-size:12px">📸 Use Photo Instead</button>
 
-      <!-- Step 2: Generate -->
-      <div style="font-size:10px;font-weight:700;letter-spacing:1.5px;color:var(--dim);margin-top:16px;margin-bottom:6px">STEP 2 — CREATE MYSTERY</div>
+      <!-- Step 3: Generate -->
+      <div style="font-size:10px;font-weight:700;letter-spacing:1.5px;color:var(--dim);margin-top:14px;margin-bottom:6px">STEP 3 — CREATE MYSTERY</div>
       <button class="btn btn-primary" id="btn-generate" onclick="generateStory()" style="font-size:14px;padding:12px">🔍 Generate Mystery</button>
 
       <button class="btn btn-outline" onclick="resetAll()" style="margin-top:16px;font-size:11px;color:var(--dim)">↺ Reset</button>
@@ -409,6 +417,38 @@ function setMode(m) {
   document.getElementById('btn-forensics').classList.toggle('active', m==='forensics');
   document.getElementById('btn-generate').textContent = m==='mystery' ? '🔍 Generate Mystery' : '🔬 Document Scene';
 }
+
+async function setLocation() {
+  const loc = document.getElementById('locationInput').value.trim();
+  if (!loc) return;
+  const status = document.getElementById('locationStatus');
+  status.textContent = '🔍 Searching...'; status.style.color = 'var(--accent)';
+  try {
+    const r = await fetch('/scan/location', {
+      method: 'POST',
+      headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({location: loc})
+    });
+    const d = await r.json();
+    if (d.context) {
+      status.textContent = `✅ ${d.summary}`;
+      status.style.color = 'var(--green, #16a34a)';
+      addLog(`📍 Location: ${loc} — ${d.summary}`, 'scan');
+    } else {
+      status.textContent = `⚠️ ${d.error || 'Could not find location'}`;
+      status.style.color = 'var(--red)';
+    }
+  } catch(e) {
+    status.textContent = `❌ ${e}`;
+    status.style.color = 'var(--red)';
+  }
+}
+
+// Allow pressing Enter in location input
+document.addEventListener('DOMContentLoaded', () => {
+  const li = document.getElementById('locationInput');
+  if (li) li.addEventListener('keydown', e => e.key === 'Enter' && setLocation());
+});
 
 async function uploadVideo(input) {
   const file = input.files[0];

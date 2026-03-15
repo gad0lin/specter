@@ -54,6 +54,65 @@ async def broadcast(msg: dict):
 TEMPLATE = Path(__file__).parent / "templates" / "index.html"
 
 
+@app.post("/scan/location")
+async def scan_location(data: dict):
+    """Tavily search for real-world context about a location."""
+    location = data.get("location", "").strip()
+    if not location:
+        return JSONResponse({"error": "No location provided"}, status_code=400)
+
+    from config.settings import get
+    tavily_key = get("tavily_api_key")
+    if not tavily_key:
+        return JSONResponse({"error": "TAVILY_API_KEY not set"}, status_code=400)
+
+    try:
+        from tavily import TavilyClient
+        client = TavilyClient(api_key=tavily_key)
+
+        # Search for the location
+        result = client.search(
+            query=f"{location} space layout history notable features events atmosphere",
+            search_depth="basic",
+            max_results=4,
+            include_answer=True,
+        )
+
+        context = result.get("answer", "") or " ".join(
+            r.get("content", "")[:200] for r in result.get("results", [])[:3]
+        )
+
+        # Add to scan results as location context
+        location_scan = {
+            "room_type": location,
+            "atmosphere": "real location — context from Tavily",
+            "objects": [],
+            "text_visible": [location],
+            "interesting": [],
+            "context": context[:600],
+            "source": "tavily_location",
+        }
+        _scan_results.append(location_scan)
+
+        # Add to pipeline
+        _pipeline_step(
+            "Location Research",
+            f"Tavily → {location}",
+            "scan", "ok", "#f0fdf4", "#16a34a",
+            results=[location_scan],
+        )
+
+        summary = context[:100] + "..." if len(context) > 100 else context
+
+        await broadcast({"type": "log", "msg": f"📍 Location context: {location} — {summary}"})
+        await broadcast({"type": "location_set", "location": location, "context": context})
+
+        return {"location": location, "context": context, "summary": summary}
+
+    except Exception as e:
+        return JSONResponse({"error": str(e)}, status_code=500)
+
+
 @app.post("/scan/video")
 async def scan_video_upload(request: Request):
     """Upload a video → extract frames → NIM scans each → rich scene map."""

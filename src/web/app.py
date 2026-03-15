@@ -13,16 +13,18 @@ import os
 import json
 import asyncio
 from pathlib import Path
+from contextlib import asynccontextmanager
 from fastapi import FastAPI, WebSocket, WebSocketDisconnect
 from fastapi.responses import HTMLResponse, JSONResponse
 from fastapi.staticfiles import StaticFiles
 
-app = FastAPI(title="SPECTER — Space Perception Engine for Crime, Theater, and Exploration Research")
 
-
-@app.on_event("startup")
-async def _startup():
+@asynccontextmanager
+async def lifespan(app):
     asyncio.create_task(_mesh.run_water_cooler_loop(broadcast))
+    yield
+
+app = FastAPI(title="SPECTER — Space Perception Engine", lifespan=lifespan)
 
 # ── State ──────────────────────────────────────────────────────────────────────
 from src.robots.mesh import mesh as _mesh
@@ -323,6 +325,7 @@ async def _handle_generate_story(ws: WebSocket, data: dict, mode: str = "sherloc
 
 
 if __name__ == "__main__":
+    import sys
     import uvicorn
-    port = int(os.environ.get("PORT", 8888))
+    port = int(sys.argv[1]) if len(sys.argv) > 1 else int(os.environ.get("PORT", 8888))
     uvicorn.run(app, host="0.0.0.0", port=port)

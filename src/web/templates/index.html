@@ -170,7 +170,8 @@ body { background:var(--bg); color:var(--cream); font-family:'DM Sans',system-ui
     <div class="sidebar-section">
       <div class="sidebar-label">Controls</div>
       <button class="btn btn-nvidia" onclick="doScan()">📸 Scan Space</button>
-      <button class="btn btn-primary" onclick="generateStory()">✨ Generate Story</button>
+      <button class="btn btn-primary" onclick="generateStory('sherlock')">🔍 Sherlock Mystery</button>
+      <button class="btn btn-outline" onclick="generateStory('generic')">✨ Generic Story</button>
       <button class="btn btn-outline" onclick="resetAll()">🔄 Reset</button>
     </div>
 
@@ -212,6 +213,7 @@ body { background:var(--bg); color:var(--cream); font-family:'DM Sans',system-ui
         </select>
         <input class="interact-input" id="visitorMsg" placeholder="Speak to this robot..." onkeydown="if(event.key==='Enter')sendMessage()">
         <button class="btn btn-primary" style="width:auto;padding:10px 20px" onclick="sendMessage()">Send</button>
+        <button class="btn btn-outline" style="width:auto;padding:10px 16px" onclick="submitSolution()" title="Submit your solution">🎯</button>
       </div>
     </div>
 
@@ -259,6 +261,12 @@ body { background:var(--bg); color:var(--cream); font-family:'DM Sans',system-ui
     } else if (data.type === 'dialogue') {
       addLog(`[${data.character}] ${data.character_said}`, 'dialogue');
       setRobotSpeaking(data.robot_id);
+    } else if (data.type === 'watson_intro') {
+      showWatsonIntro(data.text);
+    } else if (data.type === 'solution_correct') {
+      showSolution(data.response, true);
+    } else if (data.type === 'solution_wrong') {
+      showSolution(data.response, false);
     }
   }
 
@@ -289,9 +297,45 @@ body { background:var(--bg); color:var(--cream); font-family:'DM Sans',system-ui
     switchTab('scan');
   }
 
-  function generateStory() {
-    addLog('✨ Generating story world...', 'story');
-    ws.send(JSON.stringify({ action: 'generate_story', num_robots: 3, robot_ids: ['robot_0','robot_1','robot_2'] }));
+  function generateStory(mode='sherlock') {
+    const label = mode === 'sherlock' ? '🔍 Generating Sherlock mystery...' : '✨ Generating story world...';
+    addLog(label, 'story');
+    ws.send(JSON.stringify({ action: 'generate_story', mode, num_robots: 3, robot_ids: ['robot_0','robot_1','robot_2'] }));
+  }
+
+  function showWatsonIntro(text) {
+    const modal = document.createElement('div');
+    modal.style.cssText = `position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:100;display:flex;align-items:center;justify-content:center;padding:24px`;
+    modal.innerHTML = `
+      <div style="background:#141414;border:1px solid #76b900;border-radius:16px;padding:40px;max-width:560px;text-align:center">
+        <div style="font-size:48px;margin-bottom:16px">🔍</div>
+        <div style="font-family:'DM Serif Display',serif;font-size:1.4rem;color:#faf8f5;margin-bottom:16px">A New Case Begins</div>
+        <div style="color:#aaa;font-size:15px;line-height:1.8;font-style:italic">"${text}"</div>
+        <button onclick="this.parentElement.parentElement.remove()" style="margin-top:24px;padding:12px 28px;background:#df3836;color:#fff;border:none;border-radius:8px;font-size:14px;font-weight:600;cursor:pointer">Begin Investigation →</button>
+      </div>`;
+    document.body.appendChild(modal);
+  }
+
+  function showSolution(text, correct) {
+    const color = correct ? '#76b900' : '#df3836';
+    const icon = correct ? '✅' : '🔍';
+    const modal = document.createElement('div');
+    modal.style.cssText = `position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:100;display:flex;align-items:center;justify-content:center;padding:24px`;
+    modal.innerHTML = `
+      <div style="background:#141414;border:1px solid ${color};border-radius:16px;padding:40px;max-width:560px;text-align:center">
+        <div style="font-size:48px;margin-bottom:16px">${icon}</div>
+        <div style="color:${color};font-size:15px;line-height:1.8;font-style:italic">"${text}"</div>
+        <button onclick="this.parentElement.parentElement.remove()" style="margin-top:24px;padding:12px 28px;background:${color};color:#000;border:none;border-radius:8px;font-size:14px;font-weight:600;cursor:pointer">Continue</button>
+      </div>`;
+    document.body.appendChild(modal);
+  }
+
+  // Solution form
+  function submitSolution() {
+    const guess = prompt('🔍 Name the culprit, Watson!\n\n"I believe the culprit is..."');
+    if (!guess) return;
+    const robotId = document.getElementById('robotSelect').value;
+    ws.send(JSON.stringify({ action: 'interact', robot_id: robotId || 'robot_0', message: `The culprit is: ${guess}` }));
   }
 
   function renderStory(data) {

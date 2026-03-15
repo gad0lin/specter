@@ -20,10 +20,12 @@ from fastapi.staticfiles import StaticFiles
 app = FastAPI(title="LORE — Living Open Robotics Experience")
 
 # ── State ──────────────────────────────────────────────────────────────────────
-_story_world = None          # StoryWorld once generated
+_story_world = None          # StoryWorld or SherlockMystery once generated
+_story_mode = "sherlock"     # "sherlock" | "generic"
 _scan_results = []           # List of scan dicts
 _robot_states = {}           # robot_id → {character, status, position}
 _clues_found = []            # list of clues collected by visitors
+_conversation_histories = {} # robot_id → list of {role, content}
 _clients: list[WebSocket] = []
 
 
@@ -79,18 +81,37 @@ async def interact(data: dict):
     if not _story_world:
         return {"error": "No story yet — scan the space first"}
 
-    # Find character assigned to this robot
     char = next((c for c in _story_world.characters if c.robot_id == robot_id), None)
     if not char:
         char = _story_world.characters[0] if _story_world.characters else None
     if not char:
         return {"error": "No character found"}
 
-    from src.characters.dialogue import respond
+    # Maintain per-robot conversation history
+    history = _conversation_histories.setdefault(robot_id, [])
+
     loop = asyncio.get_event_loop()
-    response_text = await loop.run_in_executor(
-        None, respond, char, _story_world, message, []
-    )
+
+    # Check for solution attempt
+    if any(kw in message.lower() for kw in ["the culprit is", "i think it was", "i accuse", "solution:"]):
+        from src.story.sherlock import check_solution
+        correct, response_text = check_solution(_story_world, message)
+        kind = "solution_correct" if correct else "solution_wrong"
+        await broadcast({"type": kind, "response": response_text})
+    elif _story_mode == "sherlock":
+        from src.story.sherlock import sherlock_respond
+        response_text = await loop.run_in_executor(
+            None, sherlock_respond, char, _story_world, message, history, _clues_found
+        )
+    else:
+        from src.characters.dialogue import respond
+        response_text = await loop.run_in_executor(
+            None, respond, char, _story_world, message, history
+        )
+
+    # Update history
+    history.append({"role": "user", "content": message})
+    history.append({"role": "assistant", "content": response_text})
 
     # TTS
     from src.voice.tts import synthesize
@@ -135,7 +156,8 @@ async def websocket_endpoint(websocket: WebSocket):
                 await _handle_scan(websocket, data)
 
             elif action == "generate_story":
-                await _handle_generate_story(websocket, data)
+                mode = data.get("mode", "sherlock")
+                await _handle_generate_story(websocket, data, mode)
 
             elif action == "interact":
                 result = await interact(data)
@@ -173,8 +195,9 @@ async def _handle_scan(ws: WebSocket, data: dict):
         await ws.send_json({"type": "log", "msg": f"❌ Scan failed: {e}"})
 
 
-async def _handle_generate_story(ws: WebSocket, data: dict):
-    global _story_world
+async def _handle_generate_story(ws: WebSocket, data: dict, mode: str = "sherlock"):
+    global _story_world, _story_mode
+    _story_mode = mode
     await ws.send_json({"type": "log", "msg": "✨ Generating story from scan data..."})
 
     num_robots = data.get("num_robots", 3)
@@ -190,12 +213,21 @@ async def _handle_generate_story(ws: WebSocket, data: dict):
             "interesting": ["a mysterious disabled robot arm", "an encrypted whiteboard", "a locked server rack"],
         })
 
-    from src.story.generator import generate_story, assign_robots
     loop = asyncio.get_event_loop()
 
     try:
-        story = await loop.run_in_executor(None, generate_story, _scan_results, num_robots)
-        story = assign_robots(story, robot_ids)
+        if mode == "sherlock":
+            from src.story.sherlock import generate_sherlock_mystery
+            story = await loop.run_in_executor(None, generate_sherlock_mystery, _scan_results, num_robots)
+            # Assign robot IDs to characters
+            for i, char in enumerate(story.characters):
+                if i < len(robot_ids):
+                    char.robot_id = robot_ids[i]
+            await ws.send_json({"type": "watson_intro", "text": story.watson_intro})
+        else:
+            from src.story.generator import generate_story, assign_robots
+            story = await loop.run_in_executor(None, generate_story, _scan_results, num_robots)
+            story = assign_robots(story, robot_ids)
         _story_world = story
 
         # Update robot states

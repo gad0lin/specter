@@ -441,13 +441,21 @@ handle = function(d) {
 
 function renderStory(data) {
   const w = document.getElementById('worldContent');
+  const playerUrl = data.player_url ? `${location.origin}${data.player_url}` : '';
+  const adminUrl = data.admin_url ? `${location.origin}${data.admin_url}` : '';
   w.innerHTML = `
     <div class="story-title">${data.title||'Untitled'}</div>
     <div class="story-premise">${data.premise||''}</div>
     <div class="mystery-box">
       <div class="mystery-label">🔍 THE MYSTERY</div>
       ${data.mystery||''}
-    </div>`;
+    </div>
+    ${playerUrl ? `<div style="margin-top:16px;display:flex;gap:8px;flex-wrap:wrap">
+      <a href="${playerUrl}" target="_blank" style="padding:8px 16px;background:#1a1814;color:#fff;border-radius:8px;font-size:13px;font-weight:600;text-decoration:none">🎭 Player View</a>
+      <a href="${adminUrl}" target="_blank" style="padding:8px 16px;background:var(--bg2);color:var(--text);border:1px solid var(--border);border-radius:8px;font-size:13px;font-weight:600;text-decoration:none">🔑 Operator View</a>
+      <button onclick="navigator.clipboard.writeText('${playerUrl}');this.textContent='Copied!'" style="padding:8px 16px;background:var(--accent);color:#fff;border:none;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer">📋 Share Link</button>
+    </div>` : ''}
+    `;
 
   const rl = document.getElementById('robotList');
   const rs = document.getElementById('robotSelect');

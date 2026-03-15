@@ -213,6 +213,113 @@ async def forensics_scan(data: dict):
     return report_to_json(report)
 
 
+from src.web.mystery_store import create as create_mystery, get as get_mystery, all_sessions, add_clue, mark_solved
+
+
+@app.get("/mystery/{mystery_id}", response_class=HTMLResponse)
+async def mystery_player(mystery_id: str):
+    """Player view — interact with characters, collect clues."""
+    s = get_mystery(mystery_id)
+    if not s:
+        return HTMLResponse("<h1>Mystery not found</h1>", status_code=404)
+    return _render_mystery_page(s, admin=False)
+
+
+@app.get("/mystery/{mystery_id}/admin", response_class=HTMLResponse)
+async def mystery_admin(mystery_id: str):
+    """Operator view — see all character prompts, robot assignments, solution."""
+    s = get_mystery(mystery_id)
+    if not s:
+        return HTMLResponse("<h1>Mystery not found</h1>", status_code=404)
+    return _render_mystery_page(s, admin=True)
+
+
+@app.get("/mysteries")
+async def list_mysteries():
+    return [{"id": s.id, "title": s.title, "solved": s.solved,
+             "url": f"/mystery/{s.id}"} for s in all_sessions()]
+
+
+def _render_mystery_page(s, admin: bool = False) -> str:
+    chars_html = ""
+    for c in s.characters:
+        color = {"detective":"#6366f1","suspect":"#c93030","witness":"#2563eb",
+                 "red_herring":"#d97706","informant":"#059669"}.get(c.get("role",""), "#888")
+        secret_block = f"""<div style="margin-top:8px;padding:8px;background:#fef3c7;border-radius:6px;font-size:12px">
+            <strong>🔒 Secret:</strong> {c.get('secret','')}
+            <br><strong>📍 Zone:</strong> {c.get('robot_id','?')} → {c.get('zone','?')}
+            <br><strong>🎭 Voice:</strong> {c.get('voice_tone','')}
+            <br><strong>💡 Clues to drop:</strong> {', '.join(c.get('clues',[]))}
+        </div>""" if admin else ""
+
+        chars_html += f"""<div style="background:#fff;border:1px solid #e5e2dc;border-radius:12px;padding:20px;margin-bottom:12px">
+            <div style="display:flex;gap:12px;align-items:center;margin-bottom:8px">
+                <img src="/avatar/{c.get('role','witness')}/{c.get('name','?')}" width="48" height="48" style="border-radius:50%;border:2px solid {color}"/>
+                <div>
+                    <div style="font-weight:700;font-size:16px">{c.get('name','?')}</div>
+                    <div style="font-size:11px;color:{color};font-weight:700;text-transform:uppercase">{c.get('role','').replace('_',' ')}</div>
+                </div>
+            </div>
+            <div style="font-size:13px;color:#6b6560">{c.get('personality','')}</div>
+            <div style="font-size:13px;margin-top:6px;font-style:italic">"{c.get('intro','')}"</div>
+            {secret_block}
+        </div>"""
+
+    solution_block = f"""<div style="background:#fef3c7;border:1px solid #fde68a;border-radius:12px;padding:20px;margin-bottom:24px">
+        <div style="font-size:11px;font-weight:700;letter-spacing:2px;color:#b45309;margin-bottom:8px">🔑 SOLUTION (OPERATOR ONLY)</div>
+        <div style="font-size:14px">{s.solution}</div>
+    </div>""" if admin else ""
+
+    admin_badge = '<span style="background:#c93030;color:#fff;font-size:10px;font-weight:700;padding:3px 10px;border-radius:999px;margin-left:8px">OPERATOR VIEW</span>' if admin else ''
+
+    return f"""<!DOCTYPE html>
+<html><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>SPECTER — {s.title}</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+* {{margin:0;padding:0;box-sizing:border-box}}
+body {{background:#f8f7f4;font-family:'DM Sans',sans-serif;color:#1a1814;padding:0 0 60px}}
+.header {{background:#1a1814;color:#faf8f5;padding:16px 24px;display:flex;align-items:center;gap:12px}}
+.header svg {{opacity:0.8}}
+.container {{max-width:720px;margin:32px auto;padding:0 24px}}
+.mystery-title {{font-family:'DM Serif Display',serif;font-size:2.2rem;margin:24px 0 8px}}
+.premise {{color:#6b6560;font-size:15px;line-height:1.7;margin-bottom:16px}}
+.mystery-q {{background:#fffbeb;border:1px solid #fde68a;border-radius:10px;padding:14px 18px;font-size:14px;color:#92400e;margin-bottom:24px}}
+.section {{font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:#aaa49e;margin:24px 0 12px}}
+.share-url {{background:#fff;border:1px solid #e5e2dc;border-radius:8px;padding:10px 14px;font-family:monospace;font-size:13px;display:flex;justify-content:space-between;align-items:center;margin-bottom:24px}}
+.copy-btn {{background:#1a1814;color:#fff;border:none;padding:6px 14px;border-radius:6px;font-size:12px;cursor:pointer}}
+</style>
+</head><body>
+<div class="header">
+  <svg width="24" height="24" viewBox="0 0 96 96" fill="none"><path d="M12 48 C24 24 72 24 84 48 C72 72 24 72 12 48Z" stroke="white" stroke-width="3" fill="none"/><circle cx="48" cy="48" r="14" stroke="white" stroke-width="3" fill="none"/><circle cx="48" cy="48" r="5" fill="white"/></svg>
+  <span style="font-family:'DM Serif Display',serif;font-size:1.1rem">SPECTER</span>
+  <span style="color:#555;font-size:13px">#{s.id}</span>
+  {admin_badge}
+  <a href="/mystery/{s.id}{'admin' if not admin else ''}" style="margin-left:auto;color:#888;font-size:12px;text-decoration:none">{'→ Operator view' if not admin else '→ Player view'}</a>
+</div>
+<div class="container">
+  <div class="mystery-title">{s.title}</div>
+  <div class="premise">{s.premise}</div>
+  <div class="mystery-q"><strong>🔍 Your mission:</strong> {s.mystery_question}</div>
+
+  {solution_block}
+
+  <div class="section">Share this mystery</div>
+  <div class="share-url">
+    <span>{s.id and f'specter.charlieverse.io/mystery/{s.id}'}</span>
+    <button class="copy-btn" onclick="navigator.clipboard.writeText(location.origin+'/mystery/{s.id}');this.textContent='Copied!'">Copy link</button>
+  </div>
+
+  <div class="section">Characters ({len(s.characters)})</div>
+  {chars_html}
+
+  <div class="section">Clues collected ({len(s.clues_found)})</div>
+  <div style="color:#aaa49e;font-size:13px">{'<br>'.join(s.clues_found) if s.clues_found else 'No clues yet — interact with characters.'}</div>
+</div>
+</body></html>"""
+
+
 @app.get("/mesh")
 async def mesh_status():
     return {"robots": _mesh.all_states(), "visitor": _mesh.visitor_profile}
@@ -424,14 +531,28 @@ async def _handle_generate_story(ws: WebSocket, data: dict, mode: str = "sherloc
             }
             _mesh.register(char.robot_id, char.name, char.role)
 
+        # Save to mystery store → shareable URL
+        scan_summary = _scan_results[-1] if _scan_results else {}
+        mystery_data = {
+            "title": story.title, "premise": story.premise,
+            "mystery_question": getattr(story, 'mystery_question', story.mystery),
+            "solution": getattr(story, 'solution_reveal', getattr(story, 'solution', '')),
+            "watson_intro": getattr(story, 'watson_intro', ''),
+            "characters": [c.__dict__ for c in story.characters],
+        }
+        session = create_mystery(mystery_data, scan_summary)
+
         await broadcast({
             "type": "story_ready",
             "title": story.title,
             "premise": story.premise,
-            "mystery": story.mystery,
+            "mystery": getattr(story, 'mystery_question', story.mystery),
+            "mystery_id": session.id,
+            "player_url": f"/mystery/{session.id}",
+            "admin_url": f"/mystery/{session.id}/admin",
             "characters": [{"name": c.name, "role": c.role, "robot_id": c.robot_id} for c in story.characters],
         })
-        await ws.send_json({"type": "log", "msg": f"🎭 Story ready: '{story.title}'"})
+        await ws.send_json({"type": "log", "msg": f"🎭 '{story.title}' → /mystery/{session.id}"})
     except Exception as e:
         await ws.send_json({"type": "log", "msg": f"❌ Story generation failed: {e}"})
 

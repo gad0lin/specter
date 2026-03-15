@@ -116,38 +116,48 @@ async def scan_location(data: dict):
 @app.post("/scan/video")
 async def scan_video_upload(request: Request):
     """Upload a video → extract frames → NIM scans each → rich scene map."""
-    from fastapi import UploadFile
-    import tempfile
+    import tempfile, base64 as _b64
     form = await request.form()
     video_file = form.get("video")
     if not video_file:
         return JSONResponse({"error": "No video file"}, status_code=400)
 
-    suffix = Path(video_file.filename).suffix or ".mp4"
+    suffix = Path(getattr(video_file, 'filename', 'video.mp4')).suffix or ".mp4"
+    content = await video_file.read()
+
     with tempfile.NamedTemporaryFile(suffix=suffix, delete=False) as f:
-        content = await video_file.read()
         f.write(content)
         tmp_path = f.name
 
     await broadcast({"type": "log", "msg": f"📽️ Video received ({len(content)//1024}KB) — extracting frames..."})
-    _pipeline_steps.clear()
 
     from src.scan.video import scan_video, merge_scan_results, extract_frames
-    import base64 as _b64
+    from src.scan.vision import scan_frame
     loop = asyncio.get_event_loop()
     try:
-        # Step 1: frame extraction
+        # Step 1: extract frames
         frames_bytes = await loop.run_in_executor(None, extract_frames, tmp_path, 0.5)
-        frames_data = [{"index": i, "timestamp": round(i*2), "b64": _b64.b64encode(f).decode()} for i,f in enumerate(frames_bytes[:6])]
-        _pipeline_step("Frame Extraction", f"ffmpeg → {len(frames_bytes)} frames at 0.5fps",
+        sample = frames_bytes[::max(1, len(frames_bytes)//6)][:6]
+        frames_data = [{"index": i, "timestamp": round(i * (len(frames_bytes)/max(len(sample),1) / 0.5)),
+                        "b64": _b64.b64encode(f).decode()} for i,f in enumerate(sample)]
+        _pipeline_step("Frame Extraction", f"ffmpeg → {len(frames_bytes)} frames, using {len(sample)}",
                        "frames", "ok", "#dcfce7", "#16a34a", frames=frames_data)
+        await broadcast({"type": "log", "msg": f"📽️ {len(sample)} frames extracted — scanning with NIM..."})
 
-        # Step 2: vision scan
-        scan_step = _pipeline_step("Vision Scan", f"Llama-3.2-90B scanning {len(frames_data)} frames",
+        # Step 2: scan each frame
+        scan_step = _pipeline_step("Vision Scan", f"Scanning {len(sample)} frames...",
                                    "scan", "running", "#eff6ff", "#2563eb", results=[])
-        results = await loop.run_in_executor(None, scan_video, tmp_path, 0.5, 6)
+        results = []
+        for i, fb in enumerate(sample):
+            try:
+                r = await loop.run_in_executor(None, scan_frame, fb, f"frame {i+1}/{len(sample)}")
+                results.append(r)
+                scan_step["results"] = results
+                await broadcast({"type": "log", "msg": f"👁 Frame {i+1}/{len(sample)}: {r.get('room_type','?')} — {len(r.get('objects',[]))} objects"})
+            except Exception as e:
+                await broadcast({"type": "log", "msg": f"⚠️ Frame {i+1} failed: {e}"})
+
         scan_step["status"] = "ok"
-        scan_step["results"] = results
         scan_step["subtitle"] = f"Found {sum(len(r.get('objects',[])) for r in results)} objects across {len(results)} frames"
 
         merged = merge_scan_results(results)

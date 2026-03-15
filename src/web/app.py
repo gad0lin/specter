@@ -54,6 +54,14 @@ async def broadcast(msg: dict):
 TEMPLATE = Path(__file__).parent / "templates" / "index.html"
 
 
+@app.get("/avatar/{role}/{name}")
+async def get_avatar(role: str, name: str, speaking: bool = False):
+    from src.voice.ace_avatar import get_avatar_svg
+    from fastapi.responses import Response
+    svg = get_avatar_svg(role, name, speaking)
+    return Response(content=svg, media_type="image/svg+xml")
+
+
 @app.get("/favicon.ico")
 async def favicon():
     # SVG eye icon as favicon

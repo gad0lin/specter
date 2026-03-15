@@ -30,10 +30,12 @@ SPACE DETAILS:
 ROBOTS AVAILABLE: {num_robots}
 
 Create a mystery where:
-- ROBOT 0 = Sherlock Holmes (the detective guide, brilliant, theatrical)
-- ROBOT 1 = A suspect (nervous, hiding something)
-- ROBOT 2 = A witness (knows a key detail but doesn't realize its importance)
-- ROBOT 3+ = Additional suspects or Holmes's contacts (if more robots)
+- ROBOT 0 = Sherlock Holmes (detective guide, brilliant, theatrical, deductive)
+- ROBOT 1 = Primary Suspect (nervous, clearly hiding something)
+- ROBOT 2 = Key Witness (oblivious to importance of what they saw)
+- ROBOT 3 = Secondary Suspect / Red Herring (misleads Watson, seems guilty but isn't)
+- ROBOT 4 = Holmes's Informant (street-smart contact, drops cryptic clues for a price)
+- ROBOT 5+ = Additional characters if more robots available
 
 The visitor plays WATSON — they walk between robots collecting clues.
 
@@ -60,10 +62,11 @@ Return this JSON exactly:
       "name": "[suspect name]",
       "role": "suspect",
       "personality": "describe their manner of guilt-concealment",
-      "secret": "what they actually did",
+      "secret": "what they actually did or know",
       "voice_tone": "nervous evasive adult",
       "clues": ["suspicious detail they accidentally reveal", "alibi with a hole in it"],
-      "intro": "their opening line when approached"
+      "intro": "their opening line when approached",
+      "avatar_style": "nervous, shifty eyes, formal clothes"
     }},
     {{
       "name": "[witness name]",
@@ -72,7 +75,28 @@ Return this JSON exactly:
       "secret": "the key observation they don't know matters",
       "voice_tone": "casual friendly helpful adult",
       "clues": ["innocent-sounding observation that is actually critical", "timing detail"],
-      "intro": "their opening line when approached"
+      "intro": "their opening line when approached",
+      "avatar_style": "friendly, open face, casual attire"
+    }},
+    {{
+      "name": "[red herring name]",
+      "role": "red_herring",
+      "personality": "suspicious-seeming but actually innocent, defensive",
+      "secret": "they look guilty because of an unrelated secret (embarrassing, not criminal)",
+      "voice_tone": "defensive indignant adult",
+      "clues": ["misleading clue that points wrong direction", "real but irrelevant secret that explains their behavior"],
+      "intro": "defensive opening — they know they look suspicious",
+      "avatar_style": "anxious, overdressed, constantly checking phone"
+    }},
+    {{
+      "name": "[informant name]",
+      "role": "informant",
+      "personality": "street-smart, mercenary, will share info for something in return",
+      "secret": "saw the actual crime but won't say without being asked the right way",
+      "voice_tone": "sly knowing adult",
+      "clues": ["cryptic hint that requires follow-up", "direct clue if Watson asks cleverly"],
+      "intro": "cryptic greeting suggesting they know more than they let on",
+      "avatar_style": "sharp eyes, hood up, leaning against wall"
     }}
   ],
   "solution_reveal": "The full 3-sentence solution Holmes delivers at the end",

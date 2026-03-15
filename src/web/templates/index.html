@@ -93,9 +93,10 @@ body { background:var(--bg); color:var(--text); font-family:'DM Sans',system-ui,
 .robot-card.speaking { border-color:var(--green); background:#f0fdf4; }
 .robot-header { display:flex; gap:10px; align-items:center; }
 .robot-avatar {
-  width:36px; height:36px; border-radius:50%; background:var(--card);
-  border:1px solid var(--border); display:flex; align-items:center; justify-content:center; font-size:18px;
+  width:48px; height:48px; border-radius:50%; background:var(--card);
+  border:2px solid var(--border); overflow:hidden; flex-shrink:0;
 }
+.robot-avatar.speaking { border-color:var(--green); box-shadow:0 0 8px rgba(22,163,74,0.3); }
 .robot-name { font-weight:700; font-size:13px; }
 .robot-role { font-size:10px; color:var(--dim); text-transform:uppercase; letter-spacing:0.5px; margin-top:1px; }
 .robot-zone { font-size:11px; color:var(--accent); margin-top:4px; }
@@ -418,10 +419,12 @@ function renderStory(data) {
     card.className = 'robot-card'; card.id = `rc-${c.robot_id}`;
     card.onclick = () => { rs.value = c.robot_id; switchTab('world'); };
     card.innerHTML = `<div class="robot-header">
-      <div class="robot-avatar">${ROLE_EMOJI[c.role]||'🤖'}</div>
+      <div class="robot-avatar" id="av-${c.robot_id}">
+        <img src="/avatar/${c.role}/${encodeURIComponent(c.name)}" width="48" height="48" style="border-radius:50%"/>
+      </div>
       <div>
         <div class="robot-name">${c.name}</div>
-        <div class="robot-role" style="color:${col}">${c.role}</div>
+        <div class="robot-role" style="color:${col}">${c.role.replace('_',' ')}</div>
         <div class="robot-zone" id="zone-${c.robot_id}">—</div>
       </div></div>`;
     rl.appendChild(card);
@@ -454,9 +457,21 @@ function submitSolution() {
 }
 
 function setRobotSpeaking(rid) {
-  document.querySelectorAll('.robot-card').forEach(c => c.classList.remove('speaking'));
-  const c = document.getElementById(`rc-${rid}`);
-  if (c) { c.classList.add('speaking'); setTimeout(()=>c.classList.remove('speaking'),4000); }
+  document.querySelectorAll('.robot-card,.robot-avatar').forEach(c => c.classList.remove('speaking'));
+  const card = document.getElementById(`rc-${rid}`);
+  const av = document.getElementById(`av-${rid}`);
+  if (card) { card.classList.add('speaking'); setTimeout(()=>card.classList.remove('speaking'),4000); }
+  if (av) {
+    // Swap to speaking avatar
+    const img = av.querySelector('img');
+    if (img) {
+      const base = img.src.split('?')[0];
+      img.src = base + '?speaking=true&t=' + Date.now();
+      setTimeout(() => { img.src = base + '?speaking=false'; }, 4000);
+    }
+    av.classList.add('speaking');
+    setTimeout(()=>av.classList.remove('speaking'),4000);
+  }
 }
 
 function resetAll() { addLog('↺ Resetting...', 'system'); location.reload(); }

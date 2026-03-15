@@ -71,11 +71,26 @@ async def scan_video_upload(request: Request):
         tmp_path = f.name
 
     await broadcast({"type": "log", "msg": f"📽️ Video received ({len(content)//1024}KB) — extracting frames..."})
+    _pipeline_steps.clear()
 
-    from src.scan.video import scan_video, merge_scan_results
+    from src.scan.video import scan_video, merge_scan_results, extract_frames
+    import base64 as _b64
     loop = asyncio.get_event_loop()
     try:
+        # Step 1: frame extraction
+        frames_bytes = await loop.run_in_executor(None, extract_frames, tmp_path, 0.5)
+        frames_data = [{"index": i, "timestamp": round(i*2), "b64": _b64.b64encode(f).decode()} for i,f in enumerate(frames_bytes[:6])]
+        _pipeline_step("Frame Extraction", f"ffmpeg → {len(frames_bytes)} frames at 0.5fps",
+                       "frames", "ok", "#dcfce7", "#16a34a", frames=frames_data)
+
+        # Step 2: vision scan
+        scan_step = _pipeline_step("Vision Scan", f"Llama-3.2-90B scanning {len(frames_data)} frames",
+                                   "scan", "running", "#eff6ff", "#2563eb", results=[])
         results = await loop.run_in_executor(None, scan_video, tmp_path, 0.5, 6)
+        scan_step["status"] = "ok"
+        scan_step["results"] = results
+        scan_step["subtitle"] = f"Found {sum(len(r.get('objects',[])) for r in results)} objects across {len(results)} frames"
+
         merged = merge_scan_results(results)
         _scan_results.extend(results)
         await broadcast({"type": "scan_result", "result": merged, "count": len(_scan_results), "source": "video"})
@@ -86,6 +101,17 @@ async def scan_video_upload(request: Request):
         return JSONResponse({"error": str(e)}, status_code=500)
     finally:
         os.unlink(tmp_path)
+
+
+@app.get("/pipeline")
+async def pipeline_inspector():
+    tmpl = Path(__file__).parent / "templates" / "pipeline.html"
+    return HTMLResponse(tmpl.read_text())
+
+
+@app.get("/pipeline/data")
+async def pipeline_data():
+    return {"steps": _pipeline_steps}
 
 
 @app.get("/avatar/{role}/{name}")
@@ -214,6 +240,16 @@ async def forensics_scan(data: dict):
 
 
 from src.web.mystery_store import create as create_mystery, get as get_mystery, all_sessions, add_clue, mark_solved
+
+# ── Pipeline inspector state ───────────────────────────────────────────────────
+_pipeline_steps: list[dict] = []
+
+def _pipeline_step(title: str, subtitle: str, step_type: str, status: str = "pending",
+                   color: str = "#e5e7eb", text_color: str = "#1a1814", **kwargs) -> dict:
+    step = {"title": title, "subtitle": subtitle, "type": step_type,
+            "status": status, "color": color, "text_color": text_color, **kwargs}
+    _pipeline_steps.append(step)
+    return step
 
 
 @app.get("/mystery/{mystery_id}", response_class=HTMLResponse)
@@ -530,6 +566,15 @@ async def _handle_generate_story(ws: WebSocket, data: dict, mode: str = "sherloc
                 "status": "ready",
             }
             _mesh.register(char.robot_id, char.name, char.role)
+
+        # Add to pipeline inspector
+        _pipeline_step("Story Generation", f"Nemotron-253B → '{story.title}'",
+                       "characters", "ok", "#f0f0ff", "#6366f1",
+                       characters=[c.__dict__ for c in story.characters])
+        _pipeline_step("Mystery Created", f"{len(story.characters)} characters assigned",
+                       "story", "ok", "#dcfce7", "#16a34a",
+                       data={"title": story.title, "premise": story.premise,
+                             "mystery": getattr(story, 'mystery_question', '')})
 
         # Save to mystery store → shareable URL
         scan_summary = _scan_results[-1] if _scan_results else {}

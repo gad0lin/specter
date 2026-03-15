@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SPECTER — Pipeline Inspector</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root { --bg:#f8f7f4; --card:#fff; --border:#e5e2dc; --text:#1a1814; --muted:#6b6560; --dim:#aaa49e; --accent:#6366f1; }
+* { margin:0; padding:0; box-sizing:border-box; }
+body { background:var(--bg); color:var(--text); font-family:'DM Sans',sans-serif; }
+.header { background:#1a1814; color:#fff; padding:14px 24px; display:flex; align-items:center; gap:12px; }
+.header a { color:#888; font-size:12px; margin-left:auto; text-decoration:none; }
+.container { max-width:900px; margin:0 auto; padding:32px 24px; }
+.step { background:var(--card); border:1px solid var(--border); border-radius:14px; margin-bottom:20px; overflow:hidden; }
+.step-header { padding:16px 20px; display:flex; align-items:center; gap:12px; cursor:pointer; border-bottom:1px solid var(--border); }
+.step-num { width:28px; height:28px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-weight:700; font-size:12px; flex-shrink:0; }
+.step-title { font-weight:700; font-size:15px; }
+.step-sub { font-size:12px; color:var(--muted); margin-top:2px; }
+.step-status { margin-left:auto; font-size:11px; font-weight:700; padding:4px 10px; border-radius:999px; }
+.status-ok { background:#dcfce7; color:#16a34a; }
+.status-pending { background:#f3f4f6; color:#9ca3af; }
+.status-running { background:#eff6ff; color:#2563eb; }
+.step-body { padding:20px; display:none; }
+.step-body.open { display:block; }
+
+/* Frames grid */
+.frames { display:grid; grid-template-columns:repeat(auto-fill,minmax(200px,1fr)); gap:12px; margin-bottom:16px; }
+.frame { border-radius:8px; overflow:hidden; border:1px solid var(--border); }
+.frame img { width:100%; display:block; }
+.frame-label { padding:6px 10px; font-size:11px; color:var(--muted); background:var(--bg); }
+
+/* Scan result */
+.scan-result { background:var(--bg); border-radius:8px; padding:14px; margin-bottom:10px; }
+.scan-result h4 { font-size:12px; font-weight:700; color:var(--accent); margin-bottom:6px; }
+.tag { display:inline-block; padding:3px 8px; background:#f0f0ff; color:var(--accent); border-radius:4px; font-size:11px; margin:2px; }
+.tag.object { background:#f0fdf4; color:#16a34a; }
+.tag.interesting { background:#fffbeb; color:#b45309; }
+
+/* Character prompts */
+.char-prompt { border:1px solid var(--border); border-radius:10px; padding:16px; margin-bottom:10px; }
+.char-prompt h4 { font-size:14px; font-weight:700; margin-bottom:4px; }
+.char-role { font-size:10px; font-weight:700; letter-spacing:1px; text-transform:uppercase; color:var(--accent); margin-bottom:8px; }
+.prompt-box { background:#f8f7f4; border-radius:6px; padding:10px; font-size:12px; font-family:'SF Mono','Fira Code',monospace; color:var(--muted); line-height:1.6; white-space:pre-wrap; }
+
+/* JSON viewer */
+.json-box { background:#1a1814; color:#a8b1c5; border-radius:8px; padding:16px; font-size:12px; font-family:'SF Mono','Fira Code',monospace; overflow-x:auto; white-space:pre; line-height:1.6; }
+
+.empty { text-align:center; padding:40px; color:var(--dim); font-size:14px; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <svg width="20" height="20" viewBox="0 0 96 96" fill="none"><path d="M12 48 C24 24 72 24 84 48 C72 72 24 72 12 48Z" stroke="white" stroke-width="3" fill="none"/><circle cx="48" cy="48" r="12" stroke="white" stroke-width="3" fill="none"/><circle cx="48" cy="48" r="4" fill="white"/></svg>
+  <span style="font-family:'DM Serif Display',serif">SPECTER</span>
+  <span style="color:#555">Pipeline Inspector</span>
+  <a href="/">← Dashboard</a>
+</div>
+
+<div class="container">
+  <div id="pipeline">
+    <div class="empty">No pipeline run yet. Generate a mystery from the dashboard first.</div>
+  </div>
+</div>
+
+<script>
+async function load() {
+  const r = await fetch('/pipeline/data');
+  const d = await r.json();
+  if (!d || !d.steps || d.steps.length === 0) return;
+
+  const container = document.getElementById('pipeline');
+  container.innerHTML = '';
+
+  d.steps.forEach((step, i) => {
+    const el = document.createElement('div');
+    el.className = 'step';
+    const statusCls = step.status === 'ok' ? 'status-ok' : step.status === 'running' ? 'status-running' : 'status-pending';
+    const statusLabel = step.status === 'ok' ? `✅ ${step.duration || ''}` : step.status === 'running' ? '⏳ running' : '○ pending';
+
+    el.innerHTML = `
+      <div class="step-header" onclick="toggle(${i})">
+        <div class="step-num" style="background:${step.color||'#e5e7eb'};color:${step.text_color||'#1a1814'}">${i+1}</div>
+        <div>
+          <div class="step-title">${step.title}</div>
+          <div class="step-sub">${step.subtitle||''}</div>
+        </div>
+        <span class="step-status ${statusCls}">${statusLabel}</span>
+      </div>
+      <div class="step-body" id="body-${i}">
+        ${renderStep(step)}
+      </div>`;
+    container.appendChild(el);
+  });
+}
+
+function toggle(i) {
+  const b = document.getElementById(`body-${i}`);
+  b.classList.toggle('open');
+}
+
+function renderStep(step) {
+  if (step.type === 'frames') {
+    const frames = (step.frames||[]).map(f => `
+      <div class="frame">
+        <img src="data:image/jpeg;base64,${f.b64}" alt="frame ${f.index}"/>
+        <div class="frame-label">Frame ${f.index} · ~${f.timestamp}s</div>
+      </div>`).join('');
+    return `<div class="frames">${frames || '<div class="empty">No frames extracted yet</div>'}</div>`;
+  }
+
+  if (step.type === 'scan') {
+    const scans = (step.results||[]).map((r,i) => `
+      <div class="scan-result">
+        <h4>Frame ${i+1} — ${r.room_type||'?'}</h4>
+        <div style="margin-bottom:6px;font-size:12px;color:var(--muted);font-style:italic">${r.atmosphere||''}</div>
+        <div>
+          ${(r.objects||[]).map(o=>`<span class="tag object">${o}</span>`).join('')}
+          ${(r.interesting||[]).map(o=>`<span class="tag interesting">⭐ ${o}</span>`).join('')}
+        </div>
+        ${r.text_visible?.length ? `<div style="margin-top:6px;font-size:11px;color:var(--dim)">Text: ${r.text_visible.join(', ')}</div>` : ''}
+      </div>`).join('');
+    return scans || '<div class="empty">No scan results yet</div>';
+  }
+
+  if (step.type === 'characters') {
+    const COLORS = {detective:'#6366f1',suspect:'#c93030',witness:'#2563eb',red_herring:'#d97706',informant:'#059669'};
+    const chars = (step.characters||[]).map(c => `
+      <div class="char-prompt">
+        <div style="display:flex;gap:10px;align-items:center;margin-bottom:8px">
+          <img src="/avatar/${c.role||'witness'}/${encodeURIComponent(c.name||'?')}" width="40" height="40" style="border-radius:50%;border:2px solid ${COLORS[c.role]||'#888'}"/>
+          <div>
+            <h4>${c.name}</h4>
+            <div class="char-role" style="color:${COLORS[c.role]||'#888'}">${(c.role||'').replace('_',' ')}</div>
+          </div>
+          <span style="margin-left:auto;font-size:11px;color:var(--dim)">→ ${c.robot_id||'unassigned'}</span>
+        </div>
+        <div class="prompt-box">Personality: ${c.personality||''}
+
+Secret: ${c.secret||''}
+
+Clues: ${(c.clues||[]).join(' · ')}
+
+Voice: ${c.voice_tone||''}</div>
+      </div>`).join('');
+    return chars || '<div class="empty">No characters generated yet</div>';
+  }
+
+  if (step.type === 'story') {
+    return `<div class="json-box">${JSON.stringify(step.data||{}, null, 2)}</div>`;
+  }
+
+  return `<div class="json-box">${JSON.stringify(step, null, 2)}</div>`;
+}
+
+load();
+setInterval(load, 3000);
+</script>
+</body>
+</html>

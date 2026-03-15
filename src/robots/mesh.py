@@ -161,6 +161,12 @@ class RobotMesh:
                         })
                     await asyncio.sleep(3)
                     robot.status = "idle"
+                    # Update Rerun 3D view
+                    try:
+                        from src.robots.visualizer import update_robot
+                        update_robot(robot_id, robot.character_name, robot.role, suggestion)
+                    except Exception:
+                        pass
 
 
 # Global mesh instance

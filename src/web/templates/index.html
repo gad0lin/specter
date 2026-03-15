@@ -257,15 +257,19 @@ body { background:var(--bg); color:var(--text); font-family:'DM Sans',system-ui,
   <div class="sidebar">
     <div class="sidebar-section">
       <div class="sidebar-label">Actions</div>
-      <button class="btn btn-primary" id="btn-generate" onclick="generateStory()" style="font-size:15px;padding:14px">🔍 Generate Mystery</button>
-      <div style="margin-top:6px;display:flex;gap:6px">
-        <button class="btn btn-outline" onclick="doScan()" style="font-size:12px;flex:1">📸 Photo</button>
-        <label class="btn btn-outline" style="font-size:12px;flex:1;cursor:pointer;text-align:center;padding:9px 0">
-          🎥 Video
-          <input type="file" accept="video/*" style="display:none" onchange="uploadVideo(this)">
-        </label>
-      </div>
-      <button class="btn btn-outline" onclick="resetAll()" style="margin-top:6px;font-size:12px">↺ Reset</button>
+      <!-- Step 1: Record space -->
+      <div style="font-size:10px;font-weight:700;letter-spacing:1.5px;color:var(--dim);margin-bottom:6px">STEP 1 — SCAN SPACE</div>
+      <label class="btn btn-primary" style="cursor:pointer;text-align:center;padding:12px;font-size:14px">
+        🎥 Upload Space Video
+        <input type="file" accept="video/*" style="display:none" onchange="uploadVideo(this)">
+      </label>
+      <button class="btn btn-outline" onclick="doScan()" style="margin-top:6px;font-size:12px">📸 Use Photo Instead</button>
+
+      <!-- Step 2: Generate -->
+      <div style="font-size:10px;font-weight:700;letter-spacing:1.5px;color:var(--dim);margin-top:16px;margin-bottom:6px">STEP 2 — CREATE MYSTERY</div>
+      <button class="btn btn-primary" id="btn-generate" onclick="generateStory()" style="font-size:14px;padding:12px">🔍 Generate Mystery</button>
+
+      <button class="btn btn-outline" onclick="resetAll()" style="margin-top:16px;font-size:11px;color:var(--dim)">↺ Reset</button>
     </div>
 
     <div class="sidebar-section">
@@ -297,8 +301,18 @@ body { background:var(--bg); color:var(--text); font-family:'DM Sans',system-ui,
             <circle cx="48" cy="48" r="5" fill="#1a1814"/>
           </svg>
           <div style="font-family:'DM Serif Display',serif;font-size:1.8rem;margin-bottom:12px">The game is afoot.</div>
-          <div style="font-size:14px;color:var(--muted);margin-bottom:24px">Click <strong>Generate Mystery</strong> to begin.</div>
-          <button class="btn btn-primary" onclick="generateStory()" style="width:auto;padding:12px 32px;font-size:15px;margin:0 auto">🔍 Generate Mystery</button>
+          <div style="font-size:13px;color:var(--muted);margin-bottom:32px;line-height:1.8">
+            <strong>1.</strong> Upload a 30s video of the space<br>
+            <strong>2.</strong> Generate Mystery — AI creates characters grounded in what it sees<br>
+            <strong>3.</strong> Each robot becomes a character. Collect clues. Solve the case.
+          </div>
+          <div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap">
+            <label class="btn btn-primary" style="width:auto;padding:12px 24px;cursor:pointer">
+              🎥 Upload Video
+              <input type="file" accept="video/*" style="display:none" onchange="uploadVideo(this)">
+            </label>
+            <button onclick="generateStory()" style="padding:12px 24px;background:var(--bg2);color:var(--text);border:1px solid var(--border);border-radius:8px;font-size:14px;font-weight:600;cursor:pointer">🔍 Generate Mystery</button>
+          </div>
         </div>
       </div>
       <div class="interact-bar hidden" id="interactBar">

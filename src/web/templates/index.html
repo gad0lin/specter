@@ -256,9 +256,9 @@ body { background:var(--bg); color:var(--text); font-family:'DM Sans',system-ui,
   <div class="sidebar">
     <div class="sidebar-section">
       <div class="sidebar-label">Actions</div>
-      <button class="btn btn-outline" onclick="doScan()">📸 Scan Space</button>
-      <button class="btn btn-primary" id="btn-generate" onclick="generateStory()">🔍 Generate Mystery</button>
-      <button class="btn btn-outline" onclick="resetAll()" style="margin-top:10px;font-size:12px">↺ Reset</button>
+      <button class="btn btn-primary" id="btn-generate" onclick="generateStory()" style="font-size:15px;padding:14px">🔍 Generate Mystery</button>
+      <button class="btn btn-outline" onclick="doScan()" style="margin-top:6px;font-size:12px">📸 Scan Space (optional)</button>
+      <button class="btn btn-outline" onclick="resetAll()" style="margin-top:6px;font-size:12px">↺ Reset</button>
     </div>
 
     <div class="sidebar-section">
@@ -289,8 +289,9 @@ body { background:var(--bg); color:var(--text); font-family:'DM Sans',system-ui,
             <circle cx="48" cy="48" r="14" stroke="#1a1814" stroke-width="3" fill="none"/>
             <circle cx="48" cy="48" r="5" fill="#1a1814"/>
           </svg>
-          <div style="font-family:'DM Serif Display',serif;font-size:1.4rem;margin-bottom:8px">Scan the space first</div>
-          <div style="font-size:13px">Click 📸 Scan Space, then Generate Mystery.</div>
+          <div style="font-family:'DM Serif Display',serif;font-size:1.8rem;margin-bottom:12px">The game is afoot.</div>
+          <div style="font-size:14px;color:var(--muted);margin-bottom:24px">Click <strong>Generate Mystery</strong> to begin.</div>
+          <button class="btn btn-primary" onclick="generateStory()" style="width:auto;padding:12px 32px;font-size:15px;margin:0 auto">🔍 Generate Mystery</button>
         </div>
       </div>
       <div class="interact-bar hidden" id="interactBar">
@@ -396,9 +397,27 @@ function doScan() {
 }
 
 function generateStory() {
+  const btn = document.getElementById('btn-generate');
+  btn.textContent = '⏳ Generating...'; btn.disabled = true;
+  document.getElementById('worldContent').innerHTML = `
+    <div class="story-empty">
+      <div style="font-size:48px;margin-bottom:16px;animation:float 1s ease-in-out infinite alternate">🔍</div>
+      <div style="font-family:'DM Serif Display',serif;font-size:1.4rem;margin-bottom:8px">Generating mystery...</div>
+      <div style="font-size:13px;color:var(--dim)">Nemotron-253B is crafting your case. ~15 seconds.</div>
+    </div>`;
   addLog(`✨ Generating ${mode} scenario...`, 'story');
-  ws.send(JSON.stringify({action:'generate_story', mode, num_robots:3, robot_ids:['robot_0','robot_1','robot_2']}));
+  ws.send(JSON.stringify({action:'generate_story', mode, num_robots:5, robot_ids:['robot_0','robot_1','robot_2','robot_3','robot_4']}));
 }
+
+// Reset generate button when story arrives
+const _origHandle = handle;
+handle = function(d) {
+  _origHandle(d);
+  if (d.type === 'story_ready') {
+    const btn = document.getElementById('btn-generate');
+    if (btn) { btn.textContent = '🔄 Regenerate'; btn.disabled = false; }
+  }
+};
 
 function renderStory(data) {
   const w = document.getElementById('worldContent');

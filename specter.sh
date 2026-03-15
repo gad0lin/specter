@@ -45,8 +45,8 @@ fi
 PORT=8081
 for i in "$@"; do [[ "$i" == "--port" ]] && shift && PORT="$1"; done
 
-# Kill old process on port
-fuser -k ${PORT}/tcp 2>/dev/null || lsof -ti:$PORT 2>/dev/null | xargs kill -9 2>/dev/null || true
+# Kill old process on port (macOS-compatible)
+lsof -ti:$PORT 2>/dev/null | xargs kill -9 2>/dev/null || true
 sleep 1
 
 # ── Cloudflare tunnel ─────────────────────────────────────────────────────────

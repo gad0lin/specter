@@ -73,6 +73,7 @@ def apply_to_env():
         "minimax_api_key":   "MINIMAX_API_KEY",
         "nvidia_api_key":    "NVIDIA_API_KEY",
         "openrouter_api_key":"OPENROUTER_API_KEY",
+        "minimax_api_key":   "MINIMAX_API_KEY",
         "stack":             "SPECTER_STACK",
     }
     cfg = load()

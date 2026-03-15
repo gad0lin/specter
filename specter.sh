@@ -11,6 +11,7 @@
 #   ./specter.sh scan FILE                # one-shot forensics scan
 #
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
+export PYTHONPATH="$SCRIPT_DIR"
 exec uv run \
   --with fastapi \
   --with "uvicorn[standard]" \

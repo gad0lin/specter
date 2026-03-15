@@ -1,0 +1,663 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>LORE — Living Open Robotics Experience</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #080808;
+  --card: #111;
+  --border: #1e1e1e;
+  --cream: #faf8f5;
+  --red: #df3836;
+  --nvidia: #76b900;
+  --nebius: #4a7cf7;
+  --purple: #a855f7;
+  --teal: #14b8a6;
+  --pink: #ec4899;
+  --text: #999;
+  --dim: #444;
+}
+
+* { margin:0; padding:0; box-sizing:border-box; }
+html { scroll-behavior: smooth; }
+
+body {
+  background: var(--bg);
+  color: var(--cream);
+  font-family: 'DM Sans', system-ui, sans-serif;
+  line-height: 1.6;
+  overflow-x: hidden;
+}
+
+/* ── HERO ── */
+.hero {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 60px 24px;
+  position: relative;
+  overflow: hidden;
+}
+
+.hero::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(ellipse 80% 50% at 50% 0%, rgba(118,185,0,0.06) 0%, transparent 60%),
+    radial-gradient(ellipse 60% 40% at 20% 80%, rgba(74,124,247,0.06) 0%, transparent 60%),
+    radial-gradient(ellipse 60% 40% at 80% 80%, rgba(168,85,247,0.06) 0%, transparent 60%);
+  pointer-events: none;
+}
+
+.hero-eyebrow {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: var(--nvidia);
+  margin-bottom: 24px;
+}
+
+.hero-logo {
+  font-size: 80px;
+  margin-bottom: 16px;
+  display: block;
+  animation: float 4s ease-in-out infinite;
+}
+
+@keyframes float {
+  0%,100% { transform: translateY(0); }
+  50% { transform: translateY(-12px); }
+}
+
+h1 {
+  font-family: 'DM Serif Display', serif;
+  font-size: clamp(3.5rem, 10vw, 7rem);
+  line-height: 1;
+  letter-spacing: -2px;
+  background: linear-gradient(135deg, #faf8f5 30%, #76b900 70%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  margin-bottom: 8px;
+}
+
+.hero-full { font-family: 'DM Sans', sans-serif; font-size: 13px; color: var(--dim); letter-spacing: 2px; text-transform: uppercase; margin-bottom: 32px; }
+
+.hero-tagline {
+  font-family: 'DM Serif Display', serif;
+  font-style: italic;
+  font-size: clamp(1.2rem, 3vw, 1.8rem);
+  color: var(--text);
+  max-width: 700px;
+  margin-bottom: 48px;
+  line-height: 1.4;
+}
+
+.hero-badges {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  justify-content: center;
+  margin-bottom: 48px;
+}
+
+.badge {
+  padding: 6px 16px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  border: 1px solid currentColor;
+}
+
+.cta-row { display: flex; gap: 12px; flex-wrap: wrap; justify-content: center; }
+
+.btn-cta {
+  padding: 14px 32px;
+  border-radius: 10px;
+  font-size: 14px;
+  font-weight: 700;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  transition: transform 0.15s, opacity 0.15s;
+}
+.btn-cta:hover { transform: translateY(-2px); opacity: 0.9; }
+.btn-primary { background: var(--nvidia); color: #000; }
+.btn-secondary { background: transparent; border: 1px solid var(--border); color: var(--cream); }
+
+/* ── SECTIONS ── */
+section { padding: 96px 24px; }
+.container { max-width: 1040px; margin: 0 auto; }
+.section-label { font-size: 11px; font-weight: 700; letter-spacing: 3px; text-transform: uppercase; color: var(--red); margin-bottom: 12px; }
+.section-title { font-family: 'DM Serif Display', serif; font-size: clamp(2rem, 5vw, 3.5rem); line-height: 1.1; margin-bottom: 20px; }
+.section-body { font-size: 16px; color: var(--text); max-width: 580px; line-height: 1.8; }
+
+/* ── CONCEPT PHASES ── */
+.phases {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2px;
+  margin-top: 48px;
+}
+@media(max-width:640px) { .phases { grid-template-columns: 1fr; } }
+
+.phase {
+  background: var(--card);
+  padding: 40px;
+  position: relative;
+  overflow: hidden;
+}
+.phase::before {
+  content: attr(data-num);
+  position: absolute;
+  top: -20px;
+  right: 20px;
+  font-family: 'DM Serif Display', serif;
+  font-size: 120px;
+  color: rgba(255,255,255,0.02);
+  line-height: 1;
+}
+.phase-icon { font-size: 36px; margin-bottom: 16px; display: block; }
+.phase-title { font-weight: 700; font-size: 18px; margin-bottom: 8px; }
+.phase-body { font-size: 14px; color: var(--text); line-height: 1.7; }
+.phase-tag { margin-top: 16px; font-size: 10px; font-weight: 700; letter-spacing: 1px; }
+
+/* ── PIPELINE ── */
+.pipeline-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 1px;
+  margin-top: 48px;
+  background: var(--border);
+  border-radius: 16px;
+  overflow: hidden;
+}
+
+.pipe-node {
+  background: var(--card);
+  padding: 28px 20px;
+  text-align: center;
+  position: relative;
+}
+.pipe-emoji { font-size: 32px; display: block; margin-bottom: 10px; }
+.pipe-name { font-weight: 700; font-size: 13px; }
+.pipe-tech { font-size: 11px; color: var(--dim); margin-top: 4px; line-height: 1.4; }
+.pipe-brand { font-size: 10px; font-weight: 700; margin-top: 8px; }
+
+/* ── EXPERIENCE FLOW ── */
+.quest-steps { margin-top: 48px; }
+.quest-step {
+  display: flex;
+  gap: 24px;
+  padding: 28px 0;
+  border-bottom: 1px solid var(--border);
+  align-items: flex-start;
+}
+.quest-step:last-child { border-bottom: none; }
+.quest-num {
+  font-family: 'DM Serif Display', serif;
+  font-size: 3rem;
+  color: var(--red);
+  line-height: 1;
+  min-width: 48px;
+}
+.quest-content h3 { font-size: 16px; font-weight: 700; margin-bottom: 6px; }
+.quest-content p { font-size: 14px; color: var(--text); line-height: 1.7; }
+.quest-tag {
+  margin-left: auto;
+  align-self: center;
+  font-size: 10px;
+  font-weight: 700;
+  padding: 4px 12px;
+  border-radius: 999px;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+/* ── CHARACTERS ── */
+.characters { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px; margin-top: 48px; }
+
+.char-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 28px 24px;
+  text-align: center;
+  transition: border-color 0.2s, transform 0.2s;
+}
+.char-card:hover { transform: translateY(-4px); }
+.char-avatar { font-size: 48px; margin-bottom: 12px; display: block; }
+.char-name { font-family: 'DM Serif Display', serif; font-size: 1.3rem; margin-bottom: 4px; }
+.char-role { font-size: 11px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; margin-bottom: 12px; }
+.char-personality { font-size: 13px; color: var(--text); line-height: 1.6; }
+.char-voice { font-size: 11px; margin-top: 12px; color: var(--dim); }
+
+/* ── STACKS ── */
+.stack-tabs { display: flex; gap: 2px; margin-bottom: 2px; }
+.stack-tab {
+  padding: 10px 20px;
+  background: var(--card);
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  border-radius: 8px 8px 0 0;
+  color: var(--dim);
+  transition: color 0.2s;
+}
+.stack-tab.active { color: var(--cream); background: #1a1a1a; }
+
+.stack-body { background: #1a1a1a; border-radius: 0 12px 12px 12px; padding: 24px; }
+
+.stack-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 0;
+  border-bottom: 1px solid #222;
+  font-size: 13px;
+}
+.stack-row:last-child { border-bottom: none; }
+.stack-label { color: var(--dim); }
+.stack-val { font-weight: 600; }
+
+.stack-panel { display: none; }
+.stack-panel.active { display: block; }
+
+/* ── SHACK15 MAP ── */
+.map-preview {
+  width: 100%;
+  aspect-ratio: 16/9;
+  background: #0d0d0d;
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  position: relative;
+  overflow: hidden;
+  margin-top: 48px;
+}
+
+.map-zone {
+  position: absolute;
+  border: 1px solid;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+}
+
+.map-robot {
+  position: absolute;
+  transform: translate(-50%, -50%);
+  text-align: center;
+}
+.map-robot-icon {
+  width: 40px; height: 40px;
+  border-radius: 50%;
+  background: #141414;
+  border: 2px solid;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+  margin: 0 auto;
+  animation: robotpulse 3s ease-in-out infinite;
+}
+@keyframes robotpulse { 0%,100%{transform:scale(1)} 50%{transform:scale(1.1)} }
+.map-robot-name { font-size: 9px; font-weight: 700; margin-top: 4px; white-space: nowrap; }
+
+/* ── SPONSORS ── */
+.sponsors-grid { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 48px; }
+.sponsor-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 16px 24px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 13px;
+  font-weight: 600;
+  transition: border-color 0.2s;
+}
+
+/* ── CMD ── */
+.cmd {
+  background: #050505;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 24px 28px;
+  font-family: 'SF Mono', 'Fira Code', monospace;
+  font-size: 13px;
+  line-height: 2;
+  margin-top: 32px;
+}
+.cmd-comment { color: #444; }
+.cmd-prompt { color: #333; }
+.cmd-main { color: var(--cream); }
+.cmd-flag { color: var(--nebius); }
+.cmd-val { color: var(--nvidia); }
+
+/* ── FOOTER ── */
+footer {
+  border-top: 1px solid var(--border);
+  padding: 48px 24px;
+  text-align: center;
+  color: var(--dim);
+  font-size: 13px;
+}
+footer a { color: var(--red); text-decoration: none; }
+</style>
+</head>
+<body>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-eyebrow">Nebius.Build SF 2026 · SHACK15</div>
+  <span class="hero-logo">🔮</span>
+  <h1>LORE</h1>
+  <div class="hero-full">Living Open Robotics Experience</div>
+  <p class="hero-tagline">"Robots scan a space, generate an immersive mystery, and each becomes a character — visitors walk through and solve the case."</p>
+  <div class="hero-badges">
+    <span class="badge" style="color:#76b900">NVIDIA NIM</span>
+    <span class="badge" style="color:#4a7cf7">Nebius GPU</span>
+    <span class="badge" style="color:#14b8a6">Tavily</span>
+    <span class="badge" style="color:#a855f7">Oumi</span>
+    <span class="badge" style="color:#ec4899">MiniMax TTS</span>
+    <span class="badge" style="color:#f97316">Unitree G1</span>
+  </div>
+  <div class="cta-row">
+    <a href="https://github.com/gad0lin/lore-robot" class="btn-cta btn-primary">⭐ View on GitHub</a>
+    <a href="#concept" class="btn-cta btn-secondary">↓ See the Concept</a>
+  </div>
+</section>
+
+<!-- CONCEPT -->
+<section id="concept" style="padding-top:0">
+  <div class="container">
+    <div class="section-label">The Concept</div>
+    <h2 class="section-title">A mystery that lives<br>in physical space</h2>
+    <p class="section-body">LORE turns any real location into an immersive story world. Robots scan the space with AI vision, generate a unique narrative grounded in what they actually find, then each robot becomes a character. No script. No predetermined story. Every space is different.</p>
+
+    <div class="phases">
+      <div class="phase" data-num="1">
+        <span class="phase-icon">📸</span>
+        <div class="phase-title">Phase 1 — SCAN</div>
+        <p class="phase-body">Robots sweep the physical space autonomously. NVIDIA NIM vision identifies objects, text, and interesting details. Tavily searches real-world context. The AI builds a complete understanding of where it is.</p>
+        <div class="phase-tag" style="color:#76b900">NVIDIA NIM · Tavily · Unitree G1</div>
+      </div>
+      <div class="phase" data-num="2">
+        <span class="phase-icon">✨</span>
+        <div class="phase-title">Phase 2 — GENERATE</div>
+        <p class="phase-body">Llama-3.3-70B on Nebius GPU generates a complete mystery — title, victim, suspects, clues, and solution — entirely grounded in what was actually found in the space. No two mysteries are the same.</p>
+        <div class="phase-tag" style="color:#4a7cf7">Nebius Token Factory · Llama-3.3-70B</div>
+      </div>
+      <div class="phase" data-num="3">
+        <span class="phase-icon">🎭</span>
+        <div class="phase-title">Phase 3 — INHABIT</div>
+        <p class="phase-body">Each robot is assigned a character. Holmes stations himself at the bay window. The suspect lingers near the bar. They speak in character, remember the conversation, and whisper intel about visitors to each other.</p>
+        <div class="phase-tag" style="color:#ec4899">MiniMax TTS · Robot Mesh</div>
+      </div>
+      <div class="phase" data-num="4">
+        <span class="phase-icon">🔍</span>
+        <div class="phase-title">Phase 4 — PLAY</div>
+        <p class="phase-body">Visitors are Watson. They walk between robots, collect clues, and solve the mystery. The mirror world dashboard shows every robot's position, visitor profiles from NIM vision, and the emerging story in real time.</p>
+        <div class="phase-tag" style="color:#a855f7">OpenClaw · Omniverse (planned)</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- SHERLOCK THEME -->
+<section style="background:#0d0d0d;border-top:1px solid var(--border);border-bottom:1px solid var(--border)">
+  <div class="container">
+    <div class="section-label">Sherlock Mode</div>
+    <h2 class="section-title">Elementary, <em style="font-family:'DM Serif Display',serif;color:var(--nvidia)">Watson.</em></h2>
+    <p class="section-body">The flagship story mode. Holmes is the robot guide — brilliant, theatrical, deductive. Other robots play suspects and witnesses. Visitors collect clues across the space and submit their solution.</p>
+
+    <div class="characters">
+      <div class="char-card" style="border-color:#76b900">
+        <span class="char-avatar">🕵️</span>
+        <div class="char-name">Sherlock Holmes</div>
+        <div class="char-role" style="color:#76b900">The Detective</div>
+        <p class="char-personality">Theatrical. Deductive. Guides Watson without giving everything away. References real objects as evidence. Stationed at the bay window for maximum drama.</p>
+        <div class="char-voice" style="color:#76b900">Voice: commanding authoritative British</div>
+      </div>
+      <div class="char-card" style="border-color:#df3836">
+        <span class="char-avatar">😰</span>
+        <div class="char-name">The Suspect</div>
+        <div class="char-role" style="color:#df3836">Hiding Something</div>
+        <p class="char-personality">Evasive. Nervous. Drops clues accidentally. Constructed from real objects and events in the scanned space. Always near the bar, trying to look casual.</p>
+        <div class="char-voice" style="color:#df3836">Voice: nervous evasive adult</div>
+      </div>
+      <div class="char-card" style="border-color:#4a7cf7">
+        <span class="char-avatar">👁</span>
+        <div class="char-name">The Witness</div>
+        <div class="char-role" style="color:#4a7cf7">Oblivious Key</div>
+        <p class="char-personality">Friendly. Helpful. Doesn't realize what they saw matters. Holds the critical clue that solves everything — but frames it as small talk.</p>
+        <div class="char-voice" style="color:#4a7cf7">Voice: casual friendly helpful</div>
+      </div>
+    </div>
+
+    <div class="quest-steps" style="margin-top:48px">
+      <div class="quest-step">
+        <div class="quest-num">1</div>
+        <div class="quest-content">
+          <h3>Watson enters — Holmes introduces the case</h3>
+          <p>A modal appears with Holmes's opening narration, generated from the actual space scan. <em>"The game is afoot. A most peculiar theft has been committed in this very room..."</em></p>
+        </div>
+        <span class="quest-tag" style="background:rgba(118,185,0,0.12);color:#76b900">Nebius LLM</span>
+      </div>
+      <div class="quest-step">
+        <div class="quest-num">2</div>
+        <div class="quest-content">
+          <h3>Robots sense Watson approaching</h3>
+          <p>NIM vision profiles the visitor — mood, what they're carrying, a Holmesian deduction. Shared instantly across the robot mesh. Holmes says: <em>"I see from your lanyard you work at Nebius..."</em></p>
+        </div>
+        <span class="quest-tag" style="background:rgba(74,124,247,0.12);color:#4a7cf7">NIM Vision</span>
+      </div>
+      <div class="quest-step">
+        <div class="quest-num">3</div>
+        <div class="quest-content">
+          <h3>Robots gossip in the mesh</h3>
+          <p>While Watson talks to Holmes, the mesh whispers to the suspect: <em>"Watson seems nervous today. Be careful."</em> Idle robots wander toward activity — the space feels alive.</p>
+        </div>
+        <span class="quest-tag" style="background:rgba(168,85,247,0.12);color:#a855f7">Robot Mesh</span>
+      </div>
+      <div class="quest-step">
+        <div class="quest-num">4</div>
+        <div class="quest-content">
+          <h3>Watson submits solution</h3>
+          <p><em>"The culprit is..."</em> → Holmes responds: <em>"Elementary, my dear Watson."</em> or redirects with a new hint. The mirror world marks the case solved.</p>
+        </div>
+        <span class="quest-tag" style="background:rgba(223,56,54,0.12);color:#df3836">Interactive</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- SHACK15 MAP -->
+<section>
+  <div class="container">
+    <div class="section-label">Mirror World</div>
+    <h2 class="section-title">SHACK15 — Live Map</h2>
+    <p class="section-body">Every robot's position rendered in real-time. Click any robot to interact. Watch them wander as visitors move through the space.</p>
+
+    <div class="map-preview">
+      <!-- Zone overlays -->
+      <div class="map-zone" style="top:5%;left:15%;right:15%;height:14%;border-color:#4a7cf7;background:rgba(74,124,247,0.05);color:#4a7cf7">
+        <span>🌊</span><span>Bay View Windows</span>
+      </div>
+      <div class="map-zone" style="top:28%;left:5%;width:55%;height:35%;border-color:#333;background:rgba(255,255,255,0.02);color:#444">
+        <span>Main Hacking Area</span>
+      </div>
+      <div class="map-zone" style="top:62%;right:5%;width:20%;height:28%;border-color:#333;background:rgba(255,255,255,0.02);color:#444">
+        <span>🍸</span><span>Bar</span>
+      </div>
+      <div class="map-zone" style="top:55%;left:38%;width:22%;height:12%;border-color:#df3836;background:rgba(223,56,54,0.05);color:#df3836">
+        <span>STAGE</span>
+      </div>
+      <div class="map-zone" style="bottom:5%;left:5%;width:14%;height:14%;border-color:#444;background:rgba(255,255,255,0.02);color:#444">
+        <span>↑ IN</span>
+      </div>
+
+      <!-- Robot markers -->
+      <div class="map-robot" style="left:70%;top:15%">
+        <div class="map-robot-icon" style="border-color:#76b900;animation-delay:0s">🕵️</div>
+        <div class="map-robot-name" style="color:#76b900">HOLMES</div>
+      </div>
+      <div class="map-robot" style="left:83%;top:72%">
+        <div class="map-robot-icon" style="border-color:#df3836;animation-delay:1s">😰</div>
+        <div class="map-robot-name" style="color:#df3836">SUSPECT</div>
+      </div>
+      <div class="map-robot" style="left:35%;top:45%">
+        <div class="map-robot-icon" style="border-color:#4a7cf7;animation-delay:2s">👁</div>
+        <div class="map-robot-name" style="color:#4a7cf7">WITNESS</div>
+      </div>
+      <div class="map-robot" style="left:12%;top:85%">
+        <div class="map-robot-icon" style="border-color:#faf8f5;animation-delay:0.5s">🧑</div>
+        <div class="map-robot-name" style="color:#faf8f5">WATSON</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PIPELINE -->
+<section style="background:#0d0d0d;border-top:1px solid var(--border);border-bottom:1px solid var(--border)">
+  <div class="container">
+    <div class="section-label">Technical Stack</div>
+    <h2 class="section-title">Built on sponsor tech,<br>open source from day 1.</h2>
+
+    <div class="pipeline-grid">
+      <div class="pipe-node">
+        <span class="pipe-emoji">👁</span>
+        <div class="pipe-name">Vision OCR</div>
+        <div class="pipe-tech">Qwen2-VL-72B</div>
+        <div class="pipe-brand" style="color:#76b900">NVIDIA NIM</div>
+      </div>
+      <div class="pipe-node">
+        <span class="pipe-emoji">☁️</span>
+        <div class="pipe-name">GPU Inference</div>
+        <div class="pipe-tech">Serverless endpoints</div>
+        <div class="pipe-brand" style="color:#4a7cf7">Nebius Cloud</div>
+      </div>
+      <div class="pipe-node">
+        <span class="pipe-emoji">🔍</span>
+        <div class="pipe-name">Context Search</div>
+        <div class="pipe-tech">AI-native search</div>
+        <div class="pipe-brand" style="color:#14b8a6">Tavily</div>
+      </div>
+      <div class="pipe-node">
+        <span class="pipe-emoji">✨</span>
+        <div class="pipe-name">Story + Dialogue</div>
+        <div class="pipe-tech">Llama-3.3-70B</div>
+        <div class="pipe-brand" style="color:#a855f7">Oumi / Nebius</div>
+      </div>
+      <div class="pipe-node">
+        <span class="pipe-emoji">🎙</span>
+        <div class="pipe-name">TTS Voices</div>
+        <div class="pipe-tech">speech-2.8-hd</div>
+        <div class="pipe-brand" style="color:#ec4899">MiniMax</div>
+      </div>
+      <div class="pipe-node">
+        <span class="pipe-emoji">🤖</span>
+        <div class="pipe-name">Robot Fleet</div>
+        <div class="pipe-tech">Humanoid + G1</div>
+        <div class="pipe-brand" style="color:#f97316">Unitree / SoloTech</div>
+      </div>
+    </div>
+
+    <!-- Stack switcher -->
+    <div style="margin-top:48px">
+      <div class="stack-tabs">
+        <div class="stack-tab active" onclick="showStack('nvidia')">🔬 nvidia</div>
+        <div class="stack-tab" onclick="showStack('hybrid')">⚡ hybrid</div>
+        <div class="stack-tab" onclick="showStack('auto')">🤖 auto</div>
+      </div>
+      <div class="stack-body">
+        <div class="stack-panel active" id="stack-nvidia">
+          <div class="stack-row"><span class="stack-label">Vision</span><span class="stack-val" style="color:#76b900">NIM · Qwen2-VL-72B via Nebius GPU</span></div>
+          <div class="stack-row"><span class="stack-label">Story LLM</span><span class="stack-val" style="color:#4a7cf7">Nebius Token Factory · Llama-3.3-70B</span></div>
+          <div class="stack-row"><span class="stack-label">Search</span><span class="stack-val" style="color:#14b8a6">Tavily AI Search</span></div>
+          <div class="stack-row"><span class="stack-label">Voice dir</span><span class="stack-val" style="color:#a855f7">Oumi · Llama on Nebius</span></div>
+          <div class="stack-row"><span class="stack-label">TTS</span><span class="stack-val" style="color:#ec4899">MiniMax speech-2.8-hd</span></div>
+          <div class="stack-row"><span class="stack-label">Run</span><span class="stack-val" style="color:#76b900">./lore.sh --stack nvidia</span></div>
+        </div>
+        <div class="stack-panel" id="stack-hybrid">
+          <div class="stack-row"><span class="stack-label">Vision</span><span class="stack-val" style="color:#76b900">NIM · Qwen2-VL-72B</span></div>
+          <div class="stack-row"><span class="stack-label">Story LLM</span><span class="stack-val" style="color:#4a7cf7">Nebius Token Factory</span></div>
+          <div class="stack-row"><span class="stack-label">Search</span><span class="stack-val" style="color:#14b8a6">Tavily AI Search</span></div>
+          <div class="stack-row"><span class="stack-label">TTS</span><span class="stack-val" style="color:#ec4899">MiniMax speech-2.8-hd</span></div>
+          <div class="stack-row"><span class="stack-label">Cost</span><span class="stack-val" style="color:#22c55e">~$0 (free tiers)</span></div>
+          <div class="stack-row"><span class="stack-label">Run</span><span class="stack-val">./lore.sh --stack hybrid</span></div>
+        </div>
+        <div class="stack-panel" id="stack-auto">
+          <div class="stack-row"><span class="stack-label">Vision</span><span class="stack-val">NIM → OpenRouter → API fallback</span></div>
+          <div class="stack-row"><span class="stack-label">Story LLM</span><span class="stack-val">best available</span></div>
+          <div class="stack-row"><span class="stack-label">Search</span><span class="stack-val" style="color:#14b8a6">Tavily → fallback</span></div>
+          <div class="stack-row"><span class="stack-label">TTS</span><span class="stack-val" style="color:#ec4899">MiniMax</span></div>
+          <div class="stack-row"><span class="stack-label">Run</span><span class="stack-val">./lore.sh</span></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="cmd">
+      <div><span class="cmd-comment"># Clone and run</span></div>
+      <div><span class="cmd-prompt">$</span> <span class="cmd-main">git clone</span> <span class="cmd-val">https://github.com/gad0lin/lore-robot</span></div>
+      <div><span class="cmd-prompt">$</span> <span class="cmd-main">./lore.sh</span> <span class="cmd-flag">init</span></div>
+      <div><span class="cmd-prompt">$</span> <span class="cmd-main">./lore.sh</span> <span class="cmd-flag">--stack</span> <span class="cmd-val">nvidia</span> <span class="cmd-flag">--image-path</span> <span class="cmd-val">scan.jpg</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- SPONSORS -->
+<section>
+  <div class="container">
+    <div class="section-label">Sponsors in Stack</div>
+    <h2 class="section-title">Built with the best.</h2>
+    <div class="sponsors-grid">
+      <div class="sponsor-card" style="border-color:rgba(118,185,0,0.3)"><span style="font-size:20px">🔬</span><span style="color:#76b900">NVIDIA NIM</span></div>
+      <div class="sponsor-card" style="border-color:rgba(74,124,247,0.3)"><span style="font-size:20px">☁️</span><span style="color:#4a7cf7">Nebius Cloud</span></div>
+      <div class="sponsor-card" style="border-color:rgba(74,124,247,0.3)"><span style="font-size:20px">⚡</span><span style="color:#4a7cf7">Token Factory</span></div>
+      <div class="sponsor-card" style="border-color:rgba(20,184,166,0.3)"><span style="font-size:20px">🔍</span><span style="color:#14b8a6">Tavily</span></div>
+      <div class="sponsor-card" style="border-color:rgba(168,85,247,0.3)"><span style="font-size:20px">🧠</span><span style="color:#a855f7">Oumi</span></div>
+      <div class="sponsor-card" style="border-color:rgba(236,72,153,0.3)"><span style="font-size:20px">🎙</span><span style="color:#ec4899">MiniMax</span></div>
+      <div class="sponsor-card" style="border-color:rgba(249,115,22,0.3)"><span style="font-size:20px">🤖</span><span style="color:#f97316">Unitree G1</span></div>
+      <div class="sponsor-card" style="border-color:rgba(223,56,54,0.3)"><span style="font-size:20px">🦀</span><span style="color:#df3836">OpenClaw</span></div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div>
+    <strong style="color:#888">🔮 LORE — Living Open Robotics Experience</strong><br>
+    Built at <a href="https://www.nebius.builders">Nebius.Build SF 2026</a> · SHACK15, Ferry Building<br><br>
+    <a href="https://github.com/gad0lin/lore-robot">GitHub</a> · Open Source · MIT License
+  </div>
+</footer>
+
+<script>
+function showStack(name) {
+  document.querySelectorAll('.stack-tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.stack-panel').forEach(p => p.classList.remove('active'));
+  event.target.classList.add('active');
+  document.getElementById(`stack-${name}`).classList.add('active');
+}
+</script>
+</body>
+</html>

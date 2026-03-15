@@ -80,7 +80,16 @@ async def status():
         "clues_found": _clues_found,
         "scan_count": len(_scan_results),
         "keys": await _check_keys(),
+        "deployment": _get_stage_info(),
     }
+
+
+def _get_stage_info() -> dict:
+    try:
+        from src.robots.deployment import stage_info
+        return stage_info()
+    except Exception:
+        return {"stage": "virtual"}
 
 
 async def _check_keys() -> dict:
@@ -409,6 +418,8 @@ config:
     parser.add_argument("--mode", choices=["mystery", "forensics", "auto"], default="auto", help="Operating mode")
     parser.add_argument("--image-path", metavar="FILE", help="Scan a specific image file")
     parser.add_argument("--no-banner", action="store_true", help="Skip startup banner")
+    parser.add_argument("--stage", choices=["virtual","simulated","real"], default=None,
+                        help="Deployment stage: virtual (default) | simulated (Isaac Sim) | real (Unitree G1)")
 
     args = parser.parse_args()
 
@@ -423,6 +434,8 @@ config:
 
     if args.image_path:
         os.environ["IMAGE_PATH"] = args.image_path
+    if args.stage:
+        os.environ["SPECTER_STAGE"] = args.stage
 
     os.environ["SPECTER_MODE"] = args.mode
 
@@ -430,13 +443,15 @@ config:
         from config.settings import get
         stack = args.stack or get("stack", "auto")
         mode = args.mode
+        stage = args.stage or os.environ.get("SPECTER_STAGE", "virtual")
+        stage_labels = {"virtual":"🖥  Virtual (dashboard + Rerun)", "simulated":"🔬 Simulated (Isaac Sim on Nebius H100)", "real":"🤖 Real (Unitree G1 hardware)"}
         print(f"""
 🔮 SPECTER
+   Stage:   {stage_labels.get(stage, stage)}
    Mode:    {mode}
    Stack:   {stack}
    Port:    {args.port}
    Local:   http://localhost:{args.port}
-   Image:   {args.image_path or 'camera / dashboard input'}
 """)
 
     uvicorn.run(app, host="0.0.0.0", port=args.port)

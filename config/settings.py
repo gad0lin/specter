@@ -53,6 +53,7 @@ def get(key: str, default=None):
         "nebius_api_key":    "NEBIUS_API_KEY",
         "tavily_api_key":    "TAVILY_API_KEY",
         "minimax_api_key":   "MINIMAX_API_KEY",
+        "nvidia_api_key":    "NVIDIA_API_KEY",
         "openrouter_api_key":"OPENROUTER_API_KEY",
         "stack":             "SPECTER_STACK",
         "port":              "PORT",
@@ -70,6 +71,7 @@ def apply_to_env():
         "nebius_api_key":    "NEBIUS_API_KEY",
         "tavily_api_key":    "TAVILY_API_KEY",
         "minimax_api_key":   "MINIMAX_API_KEY",
+        "nvidia_api_key":    "NVIDIA_API_KEY",
         "openrouter_api_key":"OPENROUTER_API_KEY",
         "stack":             "SPECTER_STACK",
     }

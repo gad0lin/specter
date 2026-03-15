@@ -106,6 +106,11 @@ async def _check_keys() -> dict:
     results = {}
     nebius_key = get("nebius_api_key")
     tavily_key = get("tavily_api_key")
+    nvidia_key = get("nvidia_api_key")
+    if nvidia_key:
+        results["nvidia_ace"] = "configured"
+    else:
+        results["nvidia_ace"] = "missing (optional)"
 
     # Nebius
     if nebius_key:

@@ -15,6 +15,12 @@ export PYTHONPATH="$SCRIPT_DIR"
 
 # Parse port from args
 PORT=8081  # fixed port — matches cloudflare tunnel config
+
+# Kill anything already on this port
+if command -v lsof &>/dev/null; then
+  OLD=$(lsof -ti:$PORT 2>/dev/null)
+  [ -n "$OLD" ] && echo "   ⚠️  Killing process on :$PORT (pid $OLD)" && kill -9 $OLD 2>/dev/null
+fi
 args=("$@")
 for i in "${!args[@]}"; do
   if [[ "${args[$i]}" == "--port" || "${args[$i]}" == "-p" ]]; then

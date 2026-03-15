@@ -15,8 +15,9 @@ import json
 from openai import OpenAI
 
 NEBIUS_API_KEY = os.environ.get("NEBIUS_API_KEY", "")
+NVIDIA_API_KEY = os.environ.get("NVIDIA_API_KEY", "")
 OPENROUTER_API_KEY = os.environ.get("OPENROUTER_API_KEY", "")
-NIM_MODEL = os.environ.get("NIM_MODEL", "Qwen/Qwen2-VL-72B-Instruct")
+NIM_MODEL = os.environ.get("NIM_MODEL", "meta/llama-3.2-90b-vision-instruct")
 
 SCAN_PROMPT = """You are scanning a physical space for a real-time story generation system.
 Analyze this image and return a JSON object with:
@@ -33,6 +34,12 @@ Be specific. Focus on unique, story-worthy details. Return ONLY valid JSON."""
 
 
 def _client_nim():
+    # Prefer NVIDIA API (has Llama-3.2-90B Vision), fall back to Nebius
+    if NVIDIA_API_KEY:
+        return OpenAI(
+            base_url="https://integrate.api.nvidia.com/v1",
+            api_key=NVIDIA_API_KEY,
+        )
     return OpenAI(
         base_url="https://api.studio.nebius.com/v1",
         api_key=NEBIUS_API_KEY,

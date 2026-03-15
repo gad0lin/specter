@@ -13,7 +13,7 @@ STACKS = {
         "LLM_BACKEND":      "nvidia",                                    # NVIDIA NIM API directly
         "SEARCH_BACKEND":   "tavily",
         "TTS_BACKEND":      "minimax",
-        "NIM_MODEL":        "Qwen/Qwen2.5-VL-72B-Instruct",
+        "NIM_MODEL":        "meta/llama-3.2-90b-vision-instruct",  # via NVIDIA API
         "LLM_MODEL":        "nvidia/llama-3.1-nemotron-ultra-253b-v1",  # NVIDIA's 253B model
         "LLM_BASE_URL":     "https://integrate.api.nvidia.com/v1",
     },

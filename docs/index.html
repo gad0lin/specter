@@ -8,18 +8,20 @@
 <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <style>
 :root {
-  --bg: #080808;
-  --card: #111;
-  --border: #1e1e1e;
-  --cream: #faf8f5;
-  --red: #df3836;
-  --nvidia: #76b900;
-  --nebius: #4a7cf7;
-  --purple: #a855f7;
-  --teal: #14b8a6;
-  --pink: #ec4899;
-  --text: #999;
-  --dim: #444;
+  --bg: #f8f7f4;
+  --bg2: #f0ede8;
+  --card: #ffffff;
+  --border: #e5e2dc;
+  --cream: #1a1814;
+  --red: #c93030;
+  --nvidia: #5a9200;
+  --nebius: #2563eb;
+  --purple: #7c3aed;
+  --teal: #0d9488;
+  --pink: #db2777;
+  --text: #6b6560;
+  --dim: #aaa49e;
+  --hero-bg: #ffffff;
 }
 
 * { margin:0; padding:0; box-sizing:border-box; }
@@ -51,9 +53,9 @@ body {
   position: absolute;
   inset: 0;
   background:
-    radial-gradient(ellipse 80% 50% at 50% 0%, rgba(118,185,0,0.06) 0%, transparent 60%),
-    radial-gradient(ellipse 60% 40% at 20% 80%, rgba(74,124,247,0.06) 0%, transparent 60%),
-    radial-gradient(ellipse 60% 40% at 80% 80%, rgba(168,85,247,0.06) 0%, transparent 60%);
+    radial-gradient(ellipse 80% 50% at 50% 0%, rgba(90,146,0,0.07) 0%, transparent 60%),
+    radial-gradient(ellipse 60% 40% at 20% 80%, rgba(37,99,235,0.05) 0%, transparent 60%),
+    radial-gradient(ellipse 60% 40% at 80% 80%, rgba(124,58,237,0.05) 0%, transparent 60%);
   pointer-events: none;
 }
 
@@ -73,7 +75,7 @@ body {
   animation: float 6s ease-in-out infinite;
 }
 .hero-logo svg {
-  filter: drop-shadow(0 0 24px rgba(255,255,255,0.08));
+  filter: drop-shadow(0 0 20px rgba(0,0,0,0.06));
 }
 
 @keyframes float {
@@ -86,14 +88,14 @@ h1 {
   font-size: clamp(3.5rem, 10vw, 7rem);
   line-height: 1;
   letter-spacing: -2px;
-  background: linear-gradient(135deg, #faf8f5 30%, #76b900 70%);
+  background: linear-gradient(135deg, #1a1814 30%, #5a9200 70%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
   margin-bottom: 8px;
 }
 
-.hero-full { font-family: 'DM Sans', sans-serif; font-size: 13px; color: var(--dim); letter-spacing: 2px; text-transform: uppercase; margin-bottom: 32px; }
+.hero-full { font-family: 'DM Sans', sans-serif; font-size: 13px; color: var(--text); letter-spacing: 2px; text-transform: uppercase; margin-bottom: 32px; }
 
 .hero-tagline {
   font-family: 'DM Serif Display', serif;
@@ -259,16 +261,16 @@ section { padding: 96px 24px; }
   color: var(--dim);
   transition: color 0.2s;
 }
-.stack-tab.active { color: var(--cream); background: #1a1a1a; }
+.stack-tab.active { color: var(--cream); background: #f0ede8; }
 
-.stack-body { background: #1a1a1a; border-radius: 0 12px 12px 12px; padding: 24px; }
+.stack-body { background: #f0ede8; border-radius: 0 12px 12px 12px; padding: 24px; }
 
 .stack-row {
   display: flex;
   justify-content: space-between;
   align-items: center;
   padding: 10px 0;
-  border-bottom: 1px solid #222;
+  border-bottom: 1px solid #ece9e4;
   font-size: 13px;
 }
 .stack-row:last-child { border-bottom: none; }
@@ -282,7 +284,7 @@ section { padding: 96px 24px; }
 .map-preview {
   width: 100%;
   aspect-ratio: 16/9;
-  background: #0d0d0d;
+  background: #f0ede8;
   border: 1px solid var(--border);
   border-radius: 16px;
   position: relative;
@@ -342,7 +344,7 @@ section { padding: 96px 24px; }
 
 /* ── CMD ── */
 .cmd {
-  background: #050505;
+  background: #f8f7f4;
   border: 1px solid var(--border);
   border-radius: 12px;
   padding: 24px 28px;
@@ -376,18 +378,18 @@ footer a { color: var(--red); text-decoration: none; }
   <div class="hero-logo">
     <svg width="96" height="96" viewBox="0 0 96 96" fill="none" xmlns="http://www.w3.org/2000/svg">
       <!-- outer ring -->
-      <circle cx="48" cy="48" r="44" stroke="white" stroke-width="1.5" opacity="0.15"/>
+      <circle cx="48" cy="48" r="44" stroke="#1a1814" stroke-width="1.5" opacity="0.12"/>
       <!-- lens shape -->
-      <path d="M12 48 C24 24 72 24 84 48 C72 72 24 72 12 48Z" stroke="white" stroke-width="1.5" fill="none" opacity="0.6"/>
+      <path d="M12 48 C24 24 72 24 84 48 C72 72 24 72 12 48Z" stroke="#1a1814" stroke-width="1.5" fill="none" opacity="0.5"/>
       <!-- iris -->
-      <circle cx="48" cy="48" r="14" stroke="white" stroke-width="1.5" fill="none"/>
+      <circle cx="48" cy="48" r="14" stroke="#1a1814" stroke-width="1.5" fill="none"/>
       <!-- pupil -->
-      <circle cx="48" cy="48" r="5" fill="white"/>
+      <circle cx="48" cy="48" r="5" fill="#1a1814"/>
       <!-- highlight -->
       <circle cx="53" cy="43" r="2" fill="white" opacity="0.5"/>
       <!-- scan lines -->
-      <line x1="12" y1="48" x2="30" y2="48" stroke="white" stroke-width="0.75" opacity="0.3"/>
-      <line x1="66" y1="48" x2="84" y2="48" stroke="white" stroke-width="0.75" opacity="0.3"/>
+      <line x1="12" y1="48" x2="30" y2="48" stroke="#1a1814" stroke-width="0.75" opacity="0.2"/>
+      <line x1="66" y1="48" x2="84" y2="48" stroke="#1a1814" stroke-width="0.75" opacity="0.2"/>
     </svg>
   </div>
   <h1>SPECTER</h1>
@@ -428,7 +430,7 @@ footer a { color: var(--red); text-decoration: none; }
 </section>
 
 <!-- SAME STACK -->
-<section style="background:#0d0d0d;border-bottom:1px solid var(--border);padding:48px 24px">
+<section style="background:#f0ede8;border-bottom:1px solid var(--border);padding:48px 24px">
   <div class="container" style="text-align:center">
     <div style="font-size:11px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:var(--dim);margin-bottom:16px">Same robots. Same stack. Different prompt.</div>
     <div style="display:flex;align-items:center;justify-content:center;gap:24px;flex-wrap:wrap">
@@ -492,7 +494,7 @@ footer a { color: var(--red); text-decoration: none; }
 </section>
 
 <!-- SHERLOCK THEME -->
-<section style="background:#0d0d0d;border-top:1px solid var(--border);border-bottom:1px solid var(--border)">
+<section style="background:#f0ede8;border-top:1px solid var(--border);border-bottom:1px solid var(--border)">
   <div class="container">
     <div class="section-label">Sherlock Mode</div>
     <h2 class="section-title">Elementary, <em style="font-family:'DM Serif Display',serif;color:var(--nvidia)">Watson.</em></h2>
@@ -571,16 +573,16 @@ footer a { color: var(--red); text-decoration: none; }
       <div class="map-zone" style="top:5%;left:15%;right:15%;height:14%;border-color:#4a7cf7;background:rgba(74,124,247,0.05);color:#4a7cf7">
         <span>🌊</span><span>Bay View Windows</span>
       </div>
-      <div class="map-zone" style="top:28%;left:5%;width:55%;height:35%;border-color:#333;background:rgba(255,255,255,0.02);color:#444">
+      <div class="map-zone" style="top:28%;left:5%;width:55%;height:35%;border-color:#e0dcd6;background:rgba(255,255,255,0.02);color:#aaa49e">
         <span>Main Hacking Area</span>
       </div>
-      <div class="map-zone" style="top:62%;right:5%;width:20%;height:28%;border-color:#333;background:rgba(255,255,255,0.02);color:#444">
+      <div class="map-zone" style="top:62%;right:5%;width:20%;height:28%;border-color:#e0dcd6;background:rgba(255,255,255,0.02);color:#aaa49e">
         <span>🍸</span><span>Bar</span>
       </div>
       <div class="map-zone" style="top:55%;left:38%;width:22%;height:12%;border-color:#df3836;background:rgba(223,56,54,0.05);color:#df3836">
         <span>STAGE</span>
       </div>
-      <div class="map-zone" style="bottom:5%;left:5%;width:14%;height:14%;border-color:#444;background:rgba(255,255,255,0.02);color:#444">
+      <div class="map-zone" style="bottom:5%;left:5%;width:14%;height:14%;border-color:#aaa49e;background:rgba(255,255,255,0.02);color:#aaa49e">
         <span>↑ IN</span>
       </div>
 
@@ -598,15 +600,15 @@ footer a { color: var(--red); text-decoration: none; }
         <div class="map-robot-name" style="color:#4a7cf7">WITNESS</div>
       </div>
       <div class="map-robot" style="left:12%;top:85%">
-        <div class="map-robot-icon" style="border-color:#faf8f5;animation-delay:0.5s">🧑</div>
-        <div class="map-robot-name" style="color:#faf8f5">WATSON</div>
+        <div class="map-robot-icon" style="border-color:#1a1814;animation-delay:0.5s">🧑</div>
+        <div class="map-robot-name" style="color:#1a1814">WATSON</div>
       </div>
     </div>
   </div>
 </section>
 
 <!-- PIPELINE -->
-<section style="background:#0d0d0d;border-top:1px solid var(--border);border-bottom:1px solid var(--border)">
+<section style="background:#f0ede8;border-top:1px solid var(--border);border-bottom:1px solid var(--border)">
   <div class="container">
     <div class="section-label">Technical Stack</div>
     <h2 class="section-title">Built on sponsor tech,<br>open source from day 1.</h2>
@@ -694,7 +696,7 @@ footer a { color: var(--red); text-decoration: none; }
 </section>
 
 <!-- RPG VISION -->
-<section style="background:#0d0d0d;border-top:1px solid var(--border);border-bottom:1px solid var(--border)">
+<section style="background:#f0ede8;border-top:1px solid var(--border);border-bottom:1px solid var(--border)">
   <div class="container">
     <div class="section-label">The Bigger Vision</div>
     <h2 class="section-title">A physical-world RPG.<br><em style="font-family:'DM Serif Display',serif;color:var(--nvidia)">Robots are the NPCs.</em></h2>
@@ -757,38 +759,38 @@ footer a { color: var(--red); text-decoration: none; }
 </section>
 
 <!-- FORENSICS -->
-<section style="background:#0d0d0d;border-top:1px solid var(--border);border-bottom:1px solid var(--border)">
+<section style="background:#f0ede8;border-top:1px solid var(--border);border-bottom:1px solid var(--border)">
   <div class="container">
     <div class="section-label">Forensics Mode</div>
     <h2 class="section-title">What police miss.<br><em style="font-family:'DM Serif Display',serif;color:var(--red)">SPECTER sees.</em></h2>
     <p class="section-body">Current crime scene documentation: ~200 photos, no spatial relationships, no cross-referencing, human memory that gets challenged in court. SPECTER replaces the camera with a reasoning robot fleet.</p>
 
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:2px;margin-top:48px;border-radius:12px;overflow:hidden">
-      <div style="background:#111;padding:32px;border-bottom:1px solid #1a1a1a">
-        <div style="font-size:11px;font-weight:700;letter-spacing:2px;color:#444;margin-bottom:16px">TODAY — HUMAN PROCESS</div>
+      <div style="background:#ffffff;padding:32px;border-bottom:1px solid #ece9e4">
+        <div style="font-size:11px;font-weight:700;letter-spacing:2px;color:#aaa49e;margin-bottom:16px">TODAY — HUMAN PROCESS</div>
         <div style="display:flex;flex-direction:column;gap:10px">
-          <div style="display:flex;align-items:center;gap:10px;font-size:13px;color:#555"><span>📷</span> 200 flat photos, no spatial context</div>
-          <div style="display:flex;align-items:center;gap:10px;font-size:13px;color:#555"><span>🧠</span> Detective's memory — challengeable in court</div>
-          <div style="display:flex;align-items:center;gap:10px;font-size:13px;color:#555"><span>⏰</span> Hours to document, easy to miss details</div>
-          <div style="display:flex;align-items:center;gap:10px;font-size:13px;color:#555"><span>📁</span> Unstructured files, hard to search later</div>
-          <div style="display:flex;align-items:center;gap:10px;font-size:13px;color:#555"><span>🔗</span> No cross-referencing with external databases</div>
+          <div style="display:flex;align-items:center;gap:10px;font-size:13px;color:#9a948e"><span>📷</span> 200 flat photos, no spatial context</div>
+          <div style="display:flex;align-items:center;gap:10px;font-size:13px;color:#9a948e"><span>🧠</span> Detective's memory — challengeable in court</div>
+          <div style="display:flex;align-items:center;gap:10px;font-size:13px;color:#9a948e"><span>⏰</span> Hours to document, easy to miss details</div>
+          <div style="display:flex;align-items:center;gap:10px;font-size:13px;color:#9a948e"><span>📁</span> Unstructured files, hard to search later</div>
+          <div style="display:flex;align-items:center;gap:10px;font-size:13px;color:#9a948e"><span>🔗</span> No cross-referencing with external databases</div>
         </div>
       </div>
-      <div style="background:#0f0f0f;padding:32px">
+      <div style="background:#fafaf8;padding:32px">
         <div style="font-size:11px;font-weight:700;letter-spacing:2px;color:var(--red);margin-bottom:16px">SPECTER — ROBOT PROCESS</div>
         <div style="display:flex;flex-direction:column;gap:10px">
-          <div style="display:flex;align-items:center;gap:10px;font-size:13px;color:#ccc"><span>👁</span> 3D spatial map — every object, exact position</div>
-          <div style="display:flex;align-items:center;gap:10px;font-size:13px;color:#ccc"><span>🔍</span> NIM vision flags anomalies humans miss</div>
-          <div style="display:flex;align-items:center;gap:10px;font-size:13px;color:#ccc"><span>⚡</span> Autonomous sweep in minutes, not hours</div>
-          <div style="display:flex;align-items:center;gap:10px;font-size:13px;color:#ccc"><span>📋</span> Structured JSON case file — queryable, timestamped</div>
-          <div style="display:flex;align-items:center;gap:10px;font-size:13px;color:#ccc"><span>🌐</span> Tavily cross-references symbols, plates, items live</div>
+          <div style="display:flex;align-items:center;gap:10px;font-size:13px;color:#4a4540"><span>👁</span> 3D spatial map — every object, exact position</div>
+          <div style="display:flex;align-items:center;gap:10px;font-size:13px;color:#4a4540"><span>🔍</span> NIM vision flags anomalies humans miss</div>
+          <div style="display:flex;align-items:center;gap:10px;font-size:13px;color:#4a4540"><span>⚡</span> Autonomous sweep in minutes, not hours</div>
+          <div style="display:flex;align-items:center;gap:10px;font-size:13px;color:#4a4540"><span>📋</span> Structured JSON case file — queryable, timestamped</div>
+          <div style="display:flex;align-items:center;gap:10px;font-size:13px;color:#4a4540"><span>🌐</span> Tavily cross-references symbols, plates, items live</div>
         </div>
       </div>
     </div>
 
     <!-- Case file output example -->
-    <div style="margin-top:32px;background:#050505;border:1px solid #1a1a1a;border-radius:12px;padding:24px;font-family:'SF Mono','Fira Code',monospace;font-size:12px;line-height:1.8">
-      <div style="color:#444;margin-bottom:8px">// SPECTER case file output — auto-generated</div>
+    <div style="margin-top:32px;background:#f8f7f4;border:1px solid #e5e2dc;border-radius:12px;padding:24px;font-family: "SF Mono","Fira Code",monospace;font-size:12px;line-height:1.8">
+      <div style="color:#aaa49e;margin-bottom:8px">// SPECTER case file output — auto-generated</div>
       <div><span style="color:#4a7cf7">"scene"</span>: <span style="color:#76b900">"Apartment 4B, 221 Baker St"</span>,</div>
       <div><span style="color:#4a7cf7">"scan_time"</span>: <span style="color:#76b900">"2026-03-15T14:22:00Z"</span>,</div>
       <div><span style="color:#4a7cf7">"objects"</span>: [</div>
@@ -801,22 +803,22 @@ footer a { color: var(--red); text-decoration: none; }
 
     <!-- Use cases -->
     <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;margin-top:32px">
-      <div style="background:#111;border:1px solid #1a1a1a;border-radius:10px;padding:20px">
+      <div style="background:#ffffff;border:1px solid #e5e2dc;border-radius:10px;padding:20px">
         <div style="font-size:24px;margin-bottom:8px">👮</div>
         <div style="font-weight:700;font-size:13px;margin-bottom:4px">Law Enforcement</div>
         <div style="font-size:12px;color:var(--dim)">Crime scene documentation, court-defensible evidence, cross-referencing with criminal databases</div>
       </div>
-      <div style="background:#111;border:1px solid #1a1a1a;border-radius:10px;padding:20px">
+      <div style="background:#ffffff;border:1px solid #e5e2dc;border-radius:10px;padding:20px">
         <div style="font-size:24px;margin-bottom:8px">🚗</div>
         <div style="font-weight:700;font-size:13px;margin-bottom:4px">Accident Reconstruction</div>
         <div style="font-size:12px;color:var(--dim)">Vehicle positions, skid marks, spatial relationships — structured output for insurance and legal</div>
       </div>
-      <div style="background:#111;border:1px solid #1a1a1a;border-radius:10px;padding:20px">
+      <div style="background:#ffffff;border:1px solid #e5e2dc;border-radius:10px;padding:20px">
         <div style="font-size:24px;margin-bottom:8px">🏢</div>
         <div style="font-weight:700;font-size:13px;margin-bottom:4px">Corporate Security</div>
         <div style="font-size:12px;color:var(--dim)">Post-incident documentation, data breach scene analysis, audit trails</div>
       </div>
-      <div style="background:#111;border:1px solid #1a1a1a;border-radius:10px;padding:20px">
+      <div style="background:#ffffff;border:1px solid #e5e2dc;border-radius:10px;padding:20px">
         <div style="font-size:24px;margin-bottom:8px">🏛</div>
         <div style="font-weight:700;font-size:13px;margin-bottom:4px">Heritage &amp; Archaeology</div>
         <div style="font-size:12px;color:var(--dim)">Site documentation, artefact cataloguing, non-invasive spatial mapping</div>
@@ -845,7 +847,7 @@ footer a { color: var(--red); text-decoration: none; }
 
 <footer>
   <div>
-    <strong style="color:#888">🔮 SPECTER — Space Perception Engine for Crime, Theater, and Exploration Research</strong><br>
+    <strong style="color:#6b6560">🔮 SPECTER — Space Perception Engine for Crime, Theater, and Exploration Research</strong><br>
     Built at <a href="https://www.nebius.builders">Nebius.Build SF 2026</a> · SHACK15, Ferry Building<br><br>
     <a href="https://github.com/gad0lin/specter">GitHub</a> · Open Source · MIT License
   </div>

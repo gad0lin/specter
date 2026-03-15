@@ -19,7 +19,14 @@ from fastapi.staticfiles import StaticFiles
 
 app = FastAPI(title="LORE — Living Open Robotics Experience")
 
+
+@app.on_event("startup")
+async def _startup():
+    asyncio.create_task(_mesh.run_water_cooler_loop(broadcast))
+
 # ── State ──────────────────────────────────────────────────────────────────────
+from src.robots.mesh import mesh as _mesh
+
 _story_world = None          # StoryWorld or SherlockMystery once generated
 _story_mode = "sherlock"     # "sherlock" | "generic"
 _scan_results = []           # List of scan dicts
@@ -57,6 +64,11 @@ async def status():
     }
 
 
+@app.get("/mesh")
+async def mesh_status():
+    return {"robots": _mesh.all_states(), "visitor": _mesh.visitor_profile}
+
+
 @app.get("/story")
 async def story():
     if not _story_world:
@@ -86,6 +98,30 @@ async def interact(data: dict):
         char = _story_world.characters[0] if _story_world.characters else None
     if not char:
         return {"error": "No character found"}
+
+    # Visitor sensing — if image provided, profile them and share with mesh
+    visitor_image = data.get("visitor_image_path")
+    if visitor_image:
+        from src.scan.visitor import sense_visitor
+        try:
+            img_bytes = Path(visitor_image).read_bytes()
+            visitor_profile = await asyncio.get_event_loop().run_in_executor(None, sense_visitor, img_bytes)
+            _mesh.update_visitor(visitor_profile)
+            await broadcast({"type": "visitor_profile", "profile": visitor_profile})
+        except Exception as e:
+            print(f"⚠️  Visitor sensing failed: {e}")
+
+    # Record interaction in mesh
+    _mesh.record_interaction(robot_id)
+
+    # Generate water cooler whisper between robots
+    other_robots = [rid for rid in _mesh.robots if rid != robot_id]
+    if other_robots:
+        import random
+        target = random.choice(other_robots)
+        whisper = _mesh.generate_whisper(robot_id, target)
+        await broadcast({"type": "mesh_whisper", "from": char.name,
+                        "to": _mesh.robots[target].character_name, "text": whisper})
 
     # Maintain per-robot conversation history
     history = _conversation_histories.setdefault(robot_id, [])
@@ -230,13 +266,14 @@ async def _handle_generate_story(ws: WebSocket, data: dict, mode: str = "sherloc
             story = assign_robots(story, robot_ids)
         _story_world = story
 
-        # Update robot states
+        # Update robot states + register in mesh
         for char in story.characters:
             _robot_states[char.robot_id] = {
                 "character": char.name,
                 "role": char.role,
                 "status": "ready",
             }
+            _mesh.register(char.robot_id, char.name, char.role)
 
         await broadcast({
             "type": "story_ready",

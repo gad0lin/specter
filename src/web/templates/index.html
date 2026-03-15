@@ -194,6 +194,7 @@ body { background:var(--bg); color:var(--cream); font-family:'DM Sans',system-ui
 
     <div class="tabs">
       <div class="tab active" onclick="switchTab('world')">🌍 World</div>
+      <div class="tab" onclick="switchTab('map')">🗺 SHACK15</div>
       <div class="tab" onclick="switchTab('scan')">📸 Scan</div>
       <div class="tab" onclick="switchTab('log')">📋 Log</div>
     </div>
@@ -214,6 +215,56 @@ body { background:var(--bg); color:var(--cream); font-family:'DM Sans',system-ui
         <input class="interact-input" id="visitorMsg" placeholder="Speak to this robot..." onkeydown="if(event.key==='Enter')sendMessage()">
         <button class="btn btn-primary" style="width:auto;padding:10px 20px" onclick="sendMessage()">Send</button>
         <button class="btn btn-outline" style="width:auto;padding:10px 16px" onclick="submitSolution()" title="Submit your solution">🎯</button>
+      </div>
+    </div>
+
+    <!-- SHACK15 MAP PANEL -->
+    <div class="panel" id="panel-map">
+      <div style="padding:24px">
+        <div style="color:#555;font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;margin-bottom:12px">SHACK15 — Ferry Building, SF · Mirror World</div>
+        <div style="position:relative;width:100%;aspect-ratio:16/9;background:#0d0d0d;border:1px solid #222;border-radius:12px;overflow:hidden" id="mapCanvas">
+          <!-- SHACK15 layout -->
+          <div style="position:absolute;inset:0;opacity:0.15">
+            <!-- Bay windows top -->
+            <div style="position:absolute;top:5%;left:10%;right:10%;height:12%;background:#4a7cf7;border-radius:4px;display:flex;align-items:center;justify-content:center;font-size:10px;color:#fff">🌊 BAY VIEW WINDOWS</div>
+            <!-- Main hall -->
+            <div style="position:absolute;top:25%;left:5%;right:5%;height:40%;background:#222;border-radius:4px;border:1px solid #333"></div>
+            <!-- Bar right -->
+            <div style="position:absolute;top:65%;right:5%;width:20%;height:25%;background:#333;border-radius:4px;display:flex;align-items:center;justify-content:center;font-size:10px;color:#fff">🍸 BAR</div>
+            <!-- Stage center -->
+            <div style="position:absolute;top:55%;left:40%;width:25%;height:15%;background:#df3836;border-radius:4px;display:flex;align-items:center;justify-content:center;font-size:10px;color:#fff">STAGE</div>
+            <!-- Entrance -->
+            <div style="position:absolute;bottom:5%;left:5%;width:15%;height:15%;background:#444;border-radius:4px;display:flex;align-items:center;justify-content:center;font-size:10px;color:#fff">↑ IN</div>
+          </div>
+
+          <!-- Zone labels -->
+          <div style="position:absolute;top:8%;left:50%;transform:translateX(-50%);font-size:10px;color:#4a7cf7;font-weight:600">BAY VIEW</div>
+          <div style="position:absolute;top:35%;left:35%;font-size:10px;color:#555">MAIN HACKING AREA</div>
+          <div style="position:absolute;top:55%;left:55%;font-size:10px;color:#df3836">DEMO STAGE</div>
+          <div style="position:absolute;top:72%;right:8%;font-size:10px;color:#888">BAR</div>
+          <div style="position:absolute;bottom:8%;left:8%;font-size:10px;color:#888">ENTRANCE</div>
+
+          <!-- Robot markers (positioned by JS) -->
+          <div id="mapRobots"></div>
+
+          <!-- Watson marker -->
+          <div id="watsonMarker" style="position:absolute;display:none;transform:translate(-50%,-50%);z-index:10">
+            <div style="width:28px;height:28px;border-radius:50%;background:#faf8f5;border:2px solid #df3836;display:flex;align-items:center;justify-content:center;font-size:14px">🧑</div>
+            <div style="text-align:center;font-size:9px;color:#df3836;font-weight:700;margin-top:2px">WATSON</div>
+          </div>
+        </div>
+
+        <!-- Visitor sensing -->
+        <div style="margin-top:16px;background:#141414;border:1px solid #222;border-radius:10px;padding:16px" id="visitorPanel">
+          <div style="font-size:10px;font-weight:700;letter-spacing:2px;color:#76b900;margin-bottom:8px">👁 VISITOR PROFILE (NIM Vision)</div>
+          <div id="visitorProfile" style="color:#555;font-size:12px">No visitor detected yet.</div>
+        </div>
+
+        <!-- Water cooler activity -->
+        <div style="margin-top:12px;background:#141414;border:1px solid #222;border-radius:10px;padding:16px">
+          <div style="font-size:10px;font-weight:700;letter-spacing:2px;color:#a855f7;margin-bottom:8px">💬 ROBOT MESH ACTIVITY</div>
+          <div id="meshLog" style="color:#555;font-size:12px;max-height:80px;overflow-y:auto">Robots standing by...</div>
+        </div>
       </div>
     </div>
 
@@ -415,6 +466,82 @@ body { background:var(--bg); color:var(--cream); font-family:'DM Sans',system-ui
     fetch('/status').then(r=>r.json()).then(d => console.log(d));
     addLog('🔄 Reset requested', 'system');
   }
+
+  // ── SHACK15 MAP ──────────────────────────────────────────────────────────
+  const ZONE_POSITIONS = {
+    entrance:  { x: 8,  y: 85 },
+    main_hall: { x: 40, y: 50 },
+    bay_view:  { x: 70, y: 12 },
+    bar:       { x: 85, y: 78 },
+    robot_lab: { x: 30, y: 78 },
+    stage:     { x: 55, y: 62 },
+  };
+
+  const ROLE_EMOJI = { detective: '🕵️', suspect: '😰', witness: '👁', guide: '🤖' };
+  const ROLE_COLOR = { detective: '#76b900', suspect: '#df3836', witness: '#4a7cf7', guide: '#a855f7' };
+
+  let mapRobots = {};
+
+  function renderRobotOnMap(robotId, character, role, position) {
+    const map = document.getElementById('mapRobots');
+    let el = document.getElementById(`mapbot-${robotId}`);
+    if (!el) {
+      el = document.createElement('div');
+      el.id = `mapbot-${robotId}`;
+      el.style.cssText = 'position:absolute;transform:translate(-50%,-50%);z-index:5;transition:left 1s ease,top 1s ease;cursor:pointer;';
+      el.onclick = () => { document.getElementById('robotSelect').value = robotId; switchTab('world'); };
+      map.appendChild(el);
+    }
+    const zone = position?.zone ? ZONE_POSITIONS[position.zone] : null;
+    const x = zone ? zone.x : (position?.x || 0.5) * 100;
+    const y = zone ? zone.y : (position?.y || 0.5) * 100;
+    el.style.left = x + '%';
+    el.style.top = y + '%';
+    const color = ROLE_COLOR[role] || '#888';
+    el.innerHTML = `
+      <div style="width:36px;height:36px;border-radius:50%;background:#141414;border:2px solid ${color};display:flex;align-items:center;justify-content:center;font-size:18px">${ROLE_EMOJI[role]||'🤖'}</div>
+      <div style="text-align:center;font-size:8px;color:${color};font-weight:700;margin-top:2px;white-space:nowrap">${character}</div>`;
+    mapRobots[robotId] = { character, role, x, y };
+  }
+
+  function handleRobotMove(data) {
+    addMeshLog(`🚶 ${data.character} moves to ${data.zone_label}`);
+    renderRobotOnMap(data.robot_id, data.character, 'detective', data.position);
+  }
+
+  function addMeshLog(msg) {
+    const el = document.getElementById('meshLog');
+    el.innerHTML = `<div style="color:#a855f7">${msg}</div>` + el.innerHTML;
+  }
+
+  function renderVisitorProfile(profile) {
+    const el = document.getElementById('visitorProfile');
+    if (!profile) return;
+    el.innerHTML = `
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+        <div><span style="color:#555">Mood:</span> <span style="color:#76b900;font-weight:600">${profile.mood||'unknown'}</span></div>
+        <div><span style="color:#555">Engagement:</span> <span style="color:#76b900;font-weight:600">${profile.engagement||'?'}</span></div>
+        <div style="grid-column:1/-1"><span style="color:#555">Deduction:</span> <span style="color:#faf8f5;font-style:italic">${profile.deduction||''}</span></div>
+        ${profile.carries?.length ? `<div style="grid-column:1/-1"><span style="color:#555">Carries:</span> ${profile.carries.join(', ')}</div>` : ''}
+      </div>`;
+  }
+
+  // Extend handleMsg to include new event types
+  const _origHandle = handleMsg;
+  handleMsg = function(data) {
+    _origHandle(data);
+    if (data.type === 'robot_move') handleRobotMove(data);
+    if (data.type === 'visitor_profile') renderVisitorProfile(data.profile);
+    if (data.type === 'story_ready') {
+      data.characters?.forEach(c => {
+        const zone = {detective:'bay_view',suspect:'bar',witness:'main_hall',guide:'entrance'}[c.role]||'main_hall';
+        renderRobotOnMap(c.robot_id, c.name, c.role, { zone });
+      });
+      switchTab('map');
+      setTimeout(() => switchTab('world'), 3000);
+    }
+    if (data.type === 'mesh_whisper') addMeshLog(`💬 ${data.from} → ${data.to}: "${data.text}"`);
+  };
 
   connect();
 </script>

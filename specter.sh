@@ -12,11 +12,14 @@
 #
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 export PYTHONPATH="$SCRIPT_DIR"
+
+# uv run needs -- to separate its own flags from the app's flags
 exec uv run \
   --with fastapi \
   --with "uvicorn[standard]" \
   --with openai \
-  --with tavily-python \
+  --with "tavily-python" \
   --with requests \
+  --with httpx \
   --with python-dotenv \
-  python "$SCRIPT_DIR/src/web/app.py" "$@"
+  -- python "$SCRIPT_DIR/src/web/app.py" "$@"

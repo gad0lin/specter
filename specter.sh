@@ -65,4 +65,5 @@ exec uv run \
   --with requests \
   --with httpx \
   --with python-dotenv \
+  --with python-multipart \
   -- python "$SCRIPT_DIR/src/web/app.py" "$@"

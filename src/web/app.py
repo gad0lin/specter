@@ -462,4 +462,6 @@ config:
    Local:   http://localhost:{args.port}
 """)
 
-    uvicorn.run(app, host="0.0.0.0", port=args.port)
+    uvicorn.run(app, host="0.0.0.0", port=args.port,
+                ws_ping_interval=20, ws_ping_timeout=20,
+                proxy_headers=True, forwarded_allow_ips="*")

@@ -348,6 +348,7 @@ const ROLE_EMOJI = {detective:'🕵️',suspect:'😰',witness:'👁',guide:'�
 function connect() {
   const proto = location.protocol === 'https:' ? 'wss' : 'ws';
   ws = new WebSocket(`${proto}://${location.host}/ws`);
+  ws.onerror = e => { console.warn('WS error', e); };
   ws.onmessage = e => handle(JSON.parse(e.data));
   ws.onclose = () => setTimeout(connect, 2000);
 }

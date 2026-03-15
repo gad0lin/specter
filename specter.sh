@@ -13,21 +13,19 @@
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 export PYTHONPATH="$SCRIPT_DIR"
 
-# Extract port from args for tunnel
+# Parse port from args
 PORT=8888
-for i in "$@"; do
-  case $i in --port=*) PORT="${i#*=}" ;; esac
-done
-for i in "$@"; do
-  case $i in --port) shift; PORT="$1" ;; esac
+args=("$@")
+for i in "${!args[@]}"; do
+  if [[ "${args[$i]}" == "--port" || "${args[$i]}" == "-p" ]]; then
+    PORT="${args[$((i+1))]}"
+  fi
 done
 
-# Start Cloudflare tunnel in background if cloudflared is available
-if command -v cloudflared &>/dev/null; then
-  echo "   🌐 Starting Cloudflare tunnel..."
-  cloudflared tunnel --url "http://localhost:$PORT" --no-autoupdate 2>&1 | \
-    grep -E "trycloudflare.com|https://" | head -1 | \
-    awk '{print "   Public: " $NF}' &
+# Start Cloudflare named tunnel if config exists
+if command -v cloudflared &>/dev/null && [ -f "$HOME/.cloudflared/config.yml" ]; then
+  echo "   🌐 Starting Cloudflare tunnel → specter.charlieverse.io"
+  cloudflared tunnel run specter &>/tmp/specter-tunnel.log &
   sleep 2
 fi
 

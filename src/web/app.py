@@ -28,6 +28,8 @@ app = FastAPI(title="SPECTER — Space Perception Engine", lifespan=lifespan)
 
 # ── State ──────────────────────────────────────────────────────────────────────
 from src.robots.mesh import mesh as _mesh
+from config.settings import apply_to_env as _apply_config
+_apply_config()
 
 _story_world = None          # StoryWorld or SherlockMystery once generated
 _story_mode = "sherlock"     # "sherlock" | "generic"

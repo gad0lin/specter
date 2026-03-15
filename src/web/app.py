@@ -328,6 +328,61 @@ async def _handle_generate_story(ws: WebSocket, data: dict, mode: str = "sherloc
 
 if __name__ == "__main__":
     import sys
+    import argparse
     import uvicorn
-    port = int(sys.argv[1]) if len(sys.argv) > 1 else int(os.environ.get("PORT", 8888))
-    uvicorn.run(app, host="0.0.0.0", port=port)
+
+    parser = argparse.ArgumentParser(
+        prog="specter",
+        description="SPECTER — Space Perception Engine for Crime, Theater & Exploration Research",
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+        epilog="""
+examples:
+  ./specter.sh                          start dashboard (auto stack)
+  ./specter.sh --stack nvidia           full NVIDIA NIM + Nebius stack
+  ./specter.sh --mode mystery           Sherlock mystery game
+  ./specter.sh --mode forensics         crime scene documentation
+  ./specter.sh --image-path scan.jpg    scan a specific image
+  ./specter.sh --port 9000              custom port
+  ./specter.sh init                     first-time setup wizard
+
+config:
+  ~/.config/specter/config.yaml         API keys + defaults
+        """,
+    )
+    parser.add_argument("command", nargs="?", help="init | scan")
+    parser.add_argument("--port", "-p", type=int, default=int(os.environ.get("PORT", 8888)), help="Port (default: 8888)")
+    parser.add_argument("--stack", choices=["nvidia", "hybrid", "auto"], default=None, help="Backend stack preset")
+    parser.add_argument("--mode", choices=["mystery", "forensics", "auto"], default="auto", help="Operating mode")
+    parser.add_argument("--image-path", metavar="FILE", help="Scan a specific image file")
+    parser.add_argument("--no-banner", action="store_true", help="Skip startup banner")
+
+    args = parser.parse_args()
+
+    if args.command == "init":
+        print("🔮 SPECTER init — coming soon. Edit ~/.config/specter/config.yaml manually for now.")
+        sys.exit(0)
+
+    # Apply stack
+    if args.stack:
+        from config.stacks import apply
+        apply(args.stack)
+
+    if args.image_path:
+        os.environ["IMAGE_PATH"] = args.image_path
+
+    os.environ["SPECTER_MODE"] = args.mode
+
+    if not args.no_banner:
+        from config.settings import get
+        stack = args.stack or get("stack", "auto")
+        mode = args.mode
+        print(f"""
+🔮 SPECTER
+   Mode:    {mode}
+   Stack:   {stack}
+   Port:    {args.port}
+   Local:   http://localhost:{args.port}
+   Image:   {args.image_path or 'camera / dashboard input'}
+""")
+
+    uvicorn.run(app, host="0.0.0.0", port=args.port)

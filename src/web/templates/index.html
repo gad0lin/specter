@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>🔮 LORE — Living Open Robotics Experience</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #0a0a0a; --card: #141414; --border: #222;
+  --cream: #faf8f5; --red: #df3836; --nvidia: #76b900;
+  --nebius: #4a7cf7; --purple: #a855f7; --teal: #14b8a6;
+  --text: #ccc; --dim: #555;
+}
+* { margin:0; padding:0; box-sizing:border-box; }
+body { background:var(--bg); color:var(--cream); font-family:'DM Sans',system-ui,sans-serif; min-height:100vh; }
+
+/* HEADER */
+.header {
+  background: linear-gradient(135deg,#0f0f0f,#1a0808);
+  border-bottom:1px solid var(--border);
+  padding:20px 24px;
+  display:flex; align-items:center; gap:16px;
+}
+.header-logo { font-size:36px; }
+.header-title { font-family:'DM Serif Display',serif; font-size:1.5rem; }
+.header-sub { font-size:12px; color:var(--dim); margin-top:2px; }
+.header-stack {
+  margin-left:auto; display:flex; gap:8px; flex-wrap:wrap;
+}
+.stack-badge {
+  font-size:10px; font-weight:700; padding:4px 10px;
+  border-radius:999px; border:1px solid; letter-spacing:0.5px;
+}
+
+/* LAYOUT */
+.main { display:grid; grid-template-columns:320px 1fr; gap:0; height:calc(100vh - 73px); }
+.sidebar { border-right:1px solid var(--border); overflow-y:auto; }
+.content { overflow-y:auto; }
+
+/* SIDEBAR SECTIONS */
+.sidebar-section { padding:16px; border-bottom:1px solid var(--border); }
+.sidebar-label { font-size:10px; font-weight:700; letter-spacing:2px; text-transform:uppercase; color:var(--red); margin-bottom:12px; }
+
+/* BUTTONS */
+.btn {
+  display:block; width:100%; padding:10px 16px; border-radius:8px;
+  font-size:13px; font-weight:600; cursor:pointer; border:none;
+  text-align:center; transition:opacity 0.15s;
+}
+.btn:hover { opacity:0.85; }
+.btn-primary { background:var(--red); color:#fff; }
+.btn-nvidia { background:var(--nvidia); color:#000; }
+.btn-outline { background:transparent; border:1px solid var(--border); color:var(--cream); }
+.btn + .btn { margin-top:8px; }
+
+/* ROBOT CARDS */
+.robot-card {
+  background:var(--card); border:1px solid var(--border);
+  border-radius:10px; padding:14px; margin-bottom:8px;
+  transition:border-color 0.2s;
+}
+.robot-card.active { border-color:var(--teal); }
+.robot-card.speaking { border-color:var(--nvidia); animation:pulse 1s infinite; }
+@keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.7} }
+.robot-name { font-weight:700; font-size:14px; }
+.robot-role { font-size:11px; color:var(--dim); text-transform:uppercase; letter-spacing:0.5px; margin-top:2px; }
+.robot-status { font-size:11px; margin-top:6px; }
+
+/* AVATAR */
+.avatar {
+  width:48px; height:48px; border-radius:50%;
+  display:flex; align-items:center; justify-content:center;
+  font-size:24px; flex-shrink:0;
+  border:2px solid var(--border);
+}
+.avatar.speaking { border-color:var(--nvidia); box-shadow:0 0 12px rgba(118,185,0,0.4); }
+.robot-header { display:flex; gap:10px; align-items:center; }
+
+/* STORY PANEL */
+.story-panel { padding:24px; }
+.story-title { font-family:'DM Serif Display',serif; font-size:2rem; color:var(--cream); margin-bottom:8px; }
+.story-premise { color:var(--text); font-size:14px; line-height:1.7; max-width:600px; }
+.story-mystery {
+  margin-top:16px; padding:14px 18px;
+  background:rgba(223,56,54,0.08); border:1px solid rgba(223,56,54,0.3);
+  border-radius:8px; font-size:13px; color:#f87171;
+}
+.mystery-label { font-size:10px; font-weight:700; letter-spacing:1px; color:var(--red); margin-bottom:4px; }
+
+/* CLUES */
+.clues-grid { display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-top:16px; }
+.clue-card {
+  padding:10px 14px; background:var(--card); border:1px solid var(--border);
+  border-radius:8px; font-size:12px; color:var(--dim);
+}
+.clue-card.found { border-color:var(--teal); color:var(--teal); }
+
+/* LOG */
+.log { padding:16px; }
+.log-entry {
+  padding:8px 12px; border-radius:6px; font-size:12px;
+  margin-bottom:4px; font-family:'SF Mono','Fira Code',monospace;
+}
+.log-system { background:rgba(255,255,255,0.03); color:#666; }
+.log-scan { background:rgba(74,124,247,0.08); color:var(--nebius); }
+.log-story { background:rgba(168,85,247,0.08); color:var(--purple); }
+.log-dialogue { background:rgba(118,185,0,0.08); color:var(--nvidia); }
+.log-error { background:rgba(223,56,54,0.08); color:var(--red); }
+
+/* INTERACT */
+.interact-panel {
+  padding:16px; border-top:1px solid var(--border);
+  display:flex; gap:8px;
+}
+.interact-input {
+  flex:1; background:var(--card); border:1px solid var(--border);
+  border-radius:8px; padding:10px 14px; color:var(--cream);
+  font-size:13px; font-family:'DM Sans',sans-serif;
+}
+.interact-input:focus { outline:none; border-color:var(--teal); }
+
+/* SCAN VIZ */
+.scan-viz {
+  width:100%; aspect-ratio:16/9; background:var(--card);
+  border:1px solid var(--border); border-radius:10px;
+  display:flex; align-items:center; justify-content:center;
+  font-size:48px; margin-bottom:16px; position:relative;
+  overflow:hidden;
+}
+.scan-viz.scanning::after {
+  content:''; position:absolute; inset:0;
+  background:linear-gradient(90deg,transparent,rgba(74,124,247,0.15),transparent);
+  animation:sweep 2s infinite;
+}
+@keyframes sweep { 0%{transform:translateX(-100%)} 100%{transform:translateX(100%)} }
+
+/* TABS */
+.tabs { display:flex; border-bottom:1px solid var(--border); }
+.tab { padding:12px 20px; font-size:13px; font-weight:600; cursor:pointer; color:var(--dim); border-bottom:2px solid transparent; }
+.tab.active { color:var(--cream); border-bottom-color:var(--red); }
+
+.panel { display:none; }
+.panel.active { display:block; }
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<div class="header">
+  <div class="header-logo">🔮</div>
+  <div>
+    <div class="header-title">LORE</div>
+    <div class="header-sub">Living Open Robotics Experience · Nebius.Build SF 2026</div>
+  </div>
+  <div class="header-stack" id="stackBadges">
+    <span class="stack-badge" style="color:#76b900;border-color:#76b900">NVIDIA NIM</span>
+    <span class="stack-badge" style="color:#4a7cf7;border-color:#4a7cf7">Nebius</span>
+    <span class="stack-badge" style="color:#14b8a6;border-color:#14b8a6">Tavily</span>
+    <span class="stack-badge" style="color:#a855f7;border-color:#a855f7">Oumi</span>
+    <span class="stack-badge" style="color:#ec4899;border-color:#ec4899">MiniMax</span>
+  </div>
+</div>
+
+<div class="main">
+
+  <!-- SIDEBAR -->
+  <div class="sidebar">
+
+    <div class="sidebar-section">
+      <div class="sidebar-label">Controls</div>
+      <button class="btn btn-nvidia" onclick="doScan()">📸 Scan Space</button>
+      <button class="btn btn-primary" onclick="generateStory()">✨ Generate Story</button>
+      <button class="btn btn-outline" onclick="resetAll()">🔄 Reset</button>
+    </div>
+
+    <div class="sidebar-section">
+      <div class="sidebar-label">Robots</div>
+      <div id="robotList">
+        <div style="color:var(--dim);font-size:12px">No characters assigned yet</div>
+      </div>
+    </div>
+
+    <div class="sidebar-section">
+      <div class="sidebar-label">Clues Collected</div>
+      <div id="cluesList" style="color:var(--dim);font-size:12px">Interact with robots to collect clues...</div>
+    </div>
+
+  </div>
+
+  <!-- CONTENT -->
+  <div class="content">
+
+    <div class="tabs">
+      <div class="tab active" onclick="switchTab('world')">🌍 World</div>
+      <div class="tab" onclick="switchTab('scan')">📸 Scan</div>
+      <div class="tab" onclick="switchTab('log')">📋 Log</div>
+    </div>
+
+    <!-- WORLD PANEL -->
+    <div class="panel active" id="panel-world">
+      <div class="story-panel" id="storyPanel">
+        <div style="color:var(--dim);font-size:14px;margin-top:32px;text-align:center">
+          <div style="font-size:48px;margin-bottom:16px">🔮</div>
+          Scan the space, then generate a story world.<br>
+          Robots will become characters. Visitors solve the mystery.
+        </div>
+      </div>
+      <div class="interact-panel" id="interactPanel" style="display:none">
+        <select id="robotSelect" style="background:var(--card);border:1px solid var(--border);border-radius:8px;padding:10px;color:var(--cream);font-size:13px">
+          <option>Select robot...</option>
+        </select>
+        <input class="interact-input" id="visitorMsg" placeholder="Speak to this robot..." onkeydown="if(event.key==='Enter')sendMessage()">
+        <button class="btn btn-primary" style="width:auto;padding:10px 20px" onclick="sendMessage()">Send</button>
+      </div>
+    </div>
+
+    <!-- SCAN PANEL -->
+    <div class="panel" id="panel-scan">
+      <div style="padding:24px">
+        <div class="scan-viz" id="scanViz">📷</div>
+        <div id="scanResults" style="color:var(--dim);font-size:13px">No scans yet. Click "Scan Space" to begin.</div>
+      </div>
+    </div>
+
+    <!-- LOG PANEL -->
+    <div class="panel" id="panel-log">
+      <div class="log" id="logEntries">
+        <div class="log-entry log-system">System ready. Scan the space to begin.</div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+  let ws;
+  let story = null;
+  let activeTab = 'world';
+
+  function connect() {
+    const proto = location.protocol === 'https:' ? 'wss' : 'ws';
+    ws = new WebSocket(`${proto}://${location.host}/ws`);
+    ws.onmessage = e => handleMsg(JSON.parse(e.data));
+    ws.onclose = () => setTimeout(connect, 2000);
+    ws.onerror = () => ws.close();
+  }
+
+  function handleMsg(data) {
+    if (data.type === 'log') {
+      addLog(data.msg, 'system');
+    } else if (data.type === 'scan_result') {
+      addLog(`📸 Scanned: ${data.result.room_type} — ${data.result.objects?.slice(0,4).join(', ')}`, 'scan');
+      renderScanResult(data.result);
+    } else if (data.type === 'story_ready') {
+      story = data;
+      renderStory(data);
+      addLog(`🎭 Story: "${data.title}"`, 'story');
+    } else if (data.type === 'dialogue') {
+      addLog(`[${data.character}] ${data.character_said}`, 'dialogue');
+      setRobotSpeaking(data.robot_id);
+    }
+  }
+
+  function addLog(msg, kind='system') {
+    const el = document.createElement('div');
+    el.className = `log-entry log-${kind}`;
+    el.textContent = msg;
+    const log = document.getElementById('logEntries');
+    log.appendChild(el);
+    log.scrollTop = log.scrollHeight;
+  }
+
+  function switchTab(name) {
+    activeTab = name;
+    document.querySelectorAll('.tab').forEach((t,i) => {
+      t.classList.toggle('active', ['world','scan','log'][i] === name);
+    });
+    document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+    document.getElementById(`panel-${name}`).classList.add('active');
+  }
+
+  function doScan() {
+    const imagePath = prompt('Image path (or leave empty for demo mode):', '/tmp/lore/scan.jpg');
+    document.getElementById('scanViz').classList.add('scanning');
+    addLog('📸 Scanning space...', 'scan');
+    ws.send(JSON.stringify({ action: 'scan', image_path: imagePath || '', location: 'main area' }));
+    setTimeout(() => document.getElementById('scanViz').classList.remove('scanning'), 5000);
+    switchTab('scan');
+  }
+
+  function generateStory() {
+    addLog('✨ Generating story world...', 'story');
+    ws.send(JSON.stringify({ action: 'generate_story', num_robots: 3, robot_ids: ['robot_0','robot_1','robot_2'] }));
+  }
+
+  function renderStory(data) {
+    const panel = document.getElementById('storyPanel');
+    panel.innerHTML = `
+      <div class="story-title">${data.title}</div>
+      <div class="story-premise">${data.premise || ''}</div>
+      <div class="story-mystery">
+        <div class="mystery-label">🔍 THE MYSTERY</div>
+        ${data.mystery}
+      </div>
+    `;
+
+    // Render robots
+    const robotList = document.getElementById('robotList');
+    const robotSelect = document.getElementById('robotSelect');
+    robotList.innerHTML = '';
+    robotSelect.innerHTML = '<option>Select robot...</option>';
+
+    const emojis = { detective:'🕵️', suspect:'😰', witness:'👁', guide:'🤖' };
+    data.characters?.forEach(c => {
+      const card = document.createElement('div');
+      card.className = 'robot-card';
+      card.id = `robot-${c.robot_id}`;
+      card.innerHTML = `
+        <div class="robot-header">
+          <div class="avatar">${emojis[c.role] || '🤖'}</div>
+          <div>
+            <div class="robot-name">${c.name}</div>
+            <div class="robot-role">${c.role} · ${c.robot_id}</div>
+            <div class="robot-status" style="color:var(--teal)">● ready</div>
+          </div>
+        </div>`;
+      robotList.appendChild(card);
+      const opt = document.createElement('option');
+      opt.value = c.robot_id;
+      opt.textContent = `${c.name} (${c.role})`;
+      robotSelect.appendChild(opt);
+    });
+
+    document.getElementById('interactPanel').style.display = 'flex';
+    switchTab('world');
+  }
+
+  function renderScanResult(result) {
+    const el = document.getElementById('scanResults');
+    el.innerHTML = `
+      <div style="color:var(--cream);font-weight:600;margin-bottom:8px">${result.room_type}</div>
+      <div style="color:var(--dim);margin-bottom:8px">${result.atmosphere}</div>
+      <div style="display:flex;flex-wrap:wrap;gap:6px">
+        ${(result.objects||[]).map(o=>`<span style="background:var(--card);border:1px solid var(--border);border-radius:4px;padding:3px 8px;font-size:11px">${o}</span>`).join('')}
+      </div>
+      <div style="margin-top:12px;color:var(--nvidia);font-size:12px">
+        ⭐ ${(result.interesting||[]).join(' · ')}
+      </div>`;
+  }
+
+  function sendMessage() {
+    const robotId = document.getElementById('robotSelect').value;
+    const msg = document.getElementById('visitorMsg').value.trim();
+    if (!msg || robotId === 'Select robot...') return;
+    addLog(`👤 → [${robotId}]: ${msg}`, 'dialogue');
+    document.getElementById('visitorMsg').value = '';
+    ws.send(JSON.stringify({ action: 'interact', robot_id: robotId, message: msg }));
+  }
+
+  function setRobotSpeaking(robotId) {
+    document.querySelectorAll('.robot-card').forEach(c => c.classList.remove('speaking'));
+    const card = document.getElementById(`robot-${robotId}`);
+    if (card) {
+      card.classList.add('speaking');
+      setTimeout(() => card.classList.remove('speaking'), 4000);
+    }
+  }
+
+  function resetAll() {
+    fetch('/status').then(r=>r.json()).then(d => console.log(d));
+    addLog('🔄 Reset requested', 'system');
+  }
+
+  connect();
+</script>
+</body>
+</html>

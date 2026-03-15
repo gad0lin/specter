@@ -33,6 +33,7 @@ _scan_results = []           # List of scan dicts
 _robot_states = {}           # robot_id → {character, status, position}
 _clues_found = []            # list of clues collected by visitors
 _conversation_histories = {} # robot_id → list of {role, content}
+_cases: dict = {}           # case_id → ForensicsReport
 _clients: list[WebSocket] = []
 
 
@@ -62,6 +63,40 @@ async def status():
         "clues_found": _clues_found,
         "scan_count": len(_scan_results),
     }
+
+
+@app.get("/forensics/{case_id}")
+async def get_case(case_id: str):
+    if case_id not in _cases:
+        return JSONResponse({"error": "Case not found"}, status_code=404)
+    from src.scan.forensics import report_to_json
+    return report_to_json(_cases[case_id])
+
+
+@app.post("/forensics/scan")
+async def forensics_scan(data: dict):
+    """Trigger a forensics scan on an image."""
+    image_path = data.get("image_path") or os.environ.get("IMAGE_PATH")
+    location = data.get("location", "scene")
+    case_id = data.get("case_id", "CASE-001")
+
+    if not image_path:
+        return JSONResponse({"error": "No image_path provided"}, status_code=400)
+
+    from src.scan.forensics import scan_scene, generate_report, report_to_json
+    loop = asyncio.get_event_loop()
+
+    image_bytes = Path(image_path).read_bytes()
+    scan = await loop.run_in_executor(None, scan_scene, image_bytes, location)
+    _scan_results.append(scan)
+
+    report = await loop.run_in_executor(None, generate_report, _scan_results, case_id)
+    _cases[case_id] = report
+
+    await broadcast({"type": "forensics_report", "case_id": case_id,
+                     "summary": report.llm_summary, "anomalies": report.anomalies[:3]})
+
+    return report_to_json(report)
 
 
 @app.get("/mesh")

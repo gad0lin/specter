@@ -3,292 +3,331 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>🔮 SPECTER — Space Perception Engine for Crime, Theater, and Exploration Research</title>
-<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<title>SPECTER — Dashboard</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <style>
 :root {
-  --bg: #0a0a0a; --card: #141414; --border: #222;
-  --cream: #faf8f5; --red: #df3836; --nvidia: #76b900;
-  --nebius: #4a7cf7; --purple: #a855f7; --teal: #14b8a6;
-  --text: #ccc; --dim: #555;
+  --bg: #f8f7f4;
+  --bg2: #f0ede8;
+  --card: #ffffff;
+  --border: #e5e2dc;
+  --text: #1a1814;
+  --muted: #6b6560;
+  --dim: #aaa49e;
+  --accent: #6366f1;
+  --red: #c93030;
+  --green: #16a34a;
+  --amber: #d97706;
 }
 * { margin:0; padding:0; box-sizing:border-box; }
-body { background:var(--bg); color:var(--cream); font-family:'DM Sans',system-ui,sans-serif; min-height:100vh; }
+body { background:var(--bg); color:var(--text); font-family:'DM Sans',system-ui,sans-serif; height:100vh; display:flex; flex-direction:column; overflow:hidden; }
+
+/* STATUS BAR */
+.statusbar {
+  background:#1a1814; color:#6b6560;
+  font-size:11px; font-family:'SF Mono','Fira Code',monospace;
+  padding:5px 20px; display:flex; gap:20px; align-items:center;
+  flex-shrink:0;
+}
+.sk { display:flex; align-items:center; gap:5px; }
+.sk-dot { width:6px; height:6px; border-radius:50%; background:#444; }
+.sk-dot.ok { background:#22c55e; }
+.sk-dot.err { background:#ef4444; }
 
 /* HEADER */
 .header {
-  background: linear-gradient(135deg,#0f0f0f,#1a0808);
-  border-bottom:1px solid var(--border);
-  padding:20px 24px;
-  display:flex; align-items:center; gap:16px;
+  background:var(--card); border-bottom:1px solid var(--border);
+  padding:14px 24px; display:flex; align-items:center; gap:12px; flex-shrink:0;
 }
-.header-logo { font-size:36px; }
-.header-title { font-family:'DM Serif Display',serif; font-size:1.5rem; }
-.header-sub { font-size:12px; color:var(--dim); margin-top:2px; }
-.header-stack {
-  margin-left:auto; display:flex; gap:8px; flex-wrap:wrap;
+.header-logo {
+  width:32px; height:32px;
 }
-.stack-badge {
-  font-size:10px; font-weight:700; padding:4px 10px;
-  border-radius:999px; border:1px solid; letter-spacing:0.5px;
+.header-title { font-family:'DM Serif Display',serif; font-size:1.2rem; }
+.header-sub { font-size:11px; color:var(--dim); margin-left:4px; }
+.header-mode {
+  margin-left:auto; display:flex; gap:6px;
 }
+.mode-btn {
+  padding:6px 14px; border-radius:6px; font-size:12px; font-weight:600;
+  border:1px solid var(--border); background:transparent; color:var(--muted);
+  cursor:pointer; transition:all 0.15s;
+}
+.mode-btn.active { background:var(--text); color:#fff; border-color:var(--text); }
+.mode-btn:hover:not(.active) { background:var(--bg2); }
 
 /* LAYOUT */
-.main { display:grid; grid-template-columns:320px 1fr; gap:0; height:calc(100vh - 73px); }
-.sidebar { border-right:1px solid var(--border); overflow-y:auto; }
-.content { overflow-y:auto; }
+.main { display:flex; flex:1; overflow:hidden; }
 
-/* SIDEBAR SECTIONS */
+/* SIDEBAR */
+.sidebar {
+  width:280px; flex-shrink:0; border-right:1px solid var(--border);
+  background:var(--card); display:flex; flex-direction:column; overflow-y:auto;
+}
 .sidebar-section { padding:16px; border-bottom:1px solid var(--border); }
-.sidebar-label { font-size:10px; font-weight:700; letter-spacing:2px; text-transform:uppercase; color:var(--red); margin-bottom:12px; }
+.sidebar-label {
+  font-size:10px; font-weight:700; letter-spacing:2px; text-transform:uppercase;
+  color:var(--dim); margin-bottom:10px;
+}
 
 /* BUTTONS */
 .btn {
-  display:block; width:100%; padding:10px 16px; border-radius:8px;
-  font-size:13px; font-weight:600; cursor:pointer; border:none;
-  text-align:center; transition:opacity 0.15s;
+  width:100%; padding:9px 16px; border-radius:8px; font-size:13px; font-weight:600;
+  cursor:pointer; border:none; text-align:center; transition:all 0.15s; display:block;
 }
-.btn:hover { opacity:0.85; }
-.btn-primary { background:var(--red); color:#fff; }
-.btn-nvidia { background:var(--nvidia); color:#000; }
-.btn-outline { background:transparent; border:1px solid var(--border); color:var(--cream); }
-.btn + .btn { margin-top:8px; }
+.btn + .btn { margin-top:6px; }
+.btn-primary { background:var(--text); color:#fff; }
+.btn-primary:hover { opacity:0.85; }
+.btn-accent { background:var(--accent); color:#fff; }
+.btn-accent:hover { opacity:0.9; }
+.btn-outline { background:transparent; border:1px solid var(--border); color:var(--text); }
+.btn-outline:hover { background:var(--bg2); }
+.btn-danger { background:transparent; border:1px solid #fca5a5; color:var(--red); }
+.btn-danger:hover { background:#fef2f2; }
 
 /* ROBOT CARDS */
 .robot-card {
-  background:var(--card); border:1px solid var(--border);
-  border-radius:10px; padding:14px; margin-bottom:8px;
-  transition:border-color 0.2s;
+  background:var(--bg); border:1px solid var(--border); border-radius:10px;
+  padding:12px; margin-bottom:8px; cursor:pointer; transition:all 0.15s;
 }
-.robot-card.active { border-color:var(--teal); }
-.robot-card.speaking { border-color:var(--nvidia); animation:pulse 1s infinite; }
-@keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.7} }
-.robot-name { font-weight:700; font-size:14px; }
-.robot-role { font-size:11px; color:var(--dim); text-transform:uppercase; letter-spacing:0.5px; margin-top:2px; }
-.robot-status { font-size:11px; margin-top:6px; }
-
-/* AVATAR */
-.avatar {
-  width:48px; height:48px; border-radius:50%;
-  display:flex; align-items:center; justify-content:center;
-  font-size:24px; flex-shrink:0;
-  border:2px solid var(--border);
-}
-.avatar.speaking { border-color:var(--nvidia); box-shadow:0 0 12px rgba(118,185,0,0.4); }
+.robot-card:hover { border-color:var(--accent); }
+.robot-card.speaking { border-color:var(--green); background:#f0fdf4; }
 .robot-header { display:flex; gap:10px; align-items:center; }
+.robot-avatar {
+  width:36px; height:36px; border-radius:50%; background:var(--card);
+  border:1px solid var(--border); display:flex; align-items:center; justify-content:center; font-size:18px;
+}
+.robot-name { font-weight:700; font-size:13px; }
+.robot-role { font-size:10px; color:var(--dim); text-transform:uppercase; letter-spacing:0.5px; margin-top:1px; }
+.robot-zone { font-size:11px; color:var(--accent); margin-top:4px; }
 
-/* STORY PANEL */
-.story-panel { padding:24px; }
-.story-title { font-family:'DM Serif Display',serif; font-size:2rem; color:var(--cream); margin-bottom:8px; }
-.story-premise { color:var(--text); font-size:14px; line-height:1.7; max-width:600px; }
-.story-mystery {
-  margin-top:16px; padding:14px 18px;
-  background:rgba(223,56,54,0.08); border:1px solid rgba(223,56,54,0.3);
-  border-radius:8px; font-size:13px; color:#f87171;
-}
-.mystery-label { font-size:10px; font-weight:700; letter-spacing:1px; color:var(--red); margin-bottom:4px; }
-
-/* CLUES */
-.clues-grid { display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-top:16px; }
-.clue-card {
-  padding:10px 14px; background:var(--card); border:1px solid var(--border);
-  border-radius:8px; font-size:12px; color:var(--dim);
-}
-.clue-card.found { border-color:var(--teal); color:var(--teal); }
-
-/* LOG */
-.log { padding:16px; }
-.log-entry {
-  padding:8px 12px; border-radius:6px; font-size:12px;
-  margin-bottom:4px; font-family:'SF Mono','Fira Code',monospace;
-}
-.log-system { background:rgba(255,255,255,0.03); color:#666; }
-.log-scan { background:rgba(74,124,247,0.08); color:var(--nebius); }
-.log-story { background:rgba(168,85,247,0.08); color:var(--purple); }
-.log-dialogue { background:rgba(118,185,0,0.08); color:var(--nvidia); }
-.log-error { background:rgba(223,56,54,0.08); color:var(--red); }
-
-/* INTERACT */
-.interact-panel {
-  padding:16px; border-top:1px solid var(--border);
-  display:flex; gap:8px;
-}
-.interact-input {
-  flex:1; background:var(--card); border:1px solid var(--border);
-  border-radius:8px; padding:10px 14px; color:var(--cream);
-  font-size:13px; font-family:'DM Sans',sans-serif;
-}
-.interact-input:focus { outline:none; border-color:var(--teal); }
-
-/* SCAN VIZ */
-.scan-viz {
-  width:100%; aspect-ratio:16/9; background:var(--card);
-  border:1px solid var(--border); border-radius:10px;
-  display:flex; align-items:center; justify-content:center;
-  font-size:48px; margin-bottom:16px; position:relative;
-  overflow:hidden;
-}
-.scan-viz.scanning::after {
-  content:''; position:absolute; inset:0;
-  background:linear-gradient(90deg,transparent,rgba(74,124,247,0.15),transparent);
-  animation:sweep 2s infinite;
-}
-@keyframes sweep { 0%{transform:translateX(-100%)} 100%{transform:translateX(100%)} }
+/* CONTENT */
+.content { flex:1; display:flex; flex-direction:column; overflow:hidden; }
 
 /* TABS */
-.tabs { display:flex; border-bottom:1px solid var(--border); }
-.tab { padding:12px 20px; font-size:13px; font-weight:600; cursor:pointer; color:var(--dim); border-bottom:2px solid transparent; }
-.tab.active { color:var(--cream); border-bottom-color:var(--red); }
+.tabs { display:flex; border-bottom:1px solid var(--border); background:var(--card); flex-shrink:0; }
+.tab {
+  padding:11px 20px; font-size:13px; font-weight:600; color:var(--dim);
+  cursor:pointer; border-bottom:2px solid transparent; transition:all 0.15s;
+}
+.tab.active { color:var(--text); border-bottom-color:var(--accent); }
 
-.panel { display:none; }
+.panel { display:none; flex:1; overflow-y:auto; }
 .panel.active { display:block; }
+
+/* WORLD PANEL */
+.world-panel { padding:28px; }
+.story-empty {
+  text-align:center; padding:80px 24px; color:var(--dim);
+}
+.story-empty-icon {
+  width:64px; height:64px; margin:0 auto 20px;
+  opacity:0.2;
+}
+.story-title { font-family:'DM Serif Display',serif; font-size:2rem; margin-bottom:8px; }
+.story-premise { color:var(--muted); font-size:14px; line-height:1.7; max-width:560px; }
+.mystery-box {
+  margin-top:20px; padding:16px 20px;
+  background:#fef3c7; border:1px solid #fde68a; border-radius:10px;
+  font-size:13px; color:#92400e;
+}
+.mystery-label { font-size:10px; font-weight:700; letter-spacing:1px; color:#b45309; margin-bottom:4px; }
+
+/* INTERACT */
+.interact-bar {
+  border-top:1px solid var(--border); padding:14px 20px;
+  background:var(--card); display:flex; gap:8px; align-items:center; flex-shrink:0;
+}
+.interact-bar.hidden { display:none; }
+.interact-select {
+  background:var(--bg); border:1px solid var(--border); border-radius:8px;
+  padding:8px 12px; color:var(--text); font-size:13px; font-family:'DM Sans',sans-serif;
+}
+.interact-input {
+  flex:1; background:var(--bg); border:1px solid var(--border); border-radius:8px;
+  padding:8px 14px; color:var(--text); font-size:13px; font-family:'DM Sans',sans-serif;
+  outline:none;
+}
+.interact-input:focus { border-color:var(--accent); }
+.interact-send {
+  padding:8px 20px; background:var(--accent); color:#fff; border:none;
+  border-radius:8px; font-size:13px; font-weight:600; cursor:pointer;
+}
+.solve-btn {
+  padding:8px 14px; background:transparent; border:1px solid #fde68a;
+  color:#b45309; border-radius:8px; font-size:13px; font-weight:600; cursor:pointer;
+}
+
+/* LOG PANEL */
+.log-panel { padding:0; }
+.log-entry {
+  padding:9px 20px; font-size:12px; border-bottom:1px solid var(--border);
+  line-height:1.5; font-family:'SF Mono','Fira Code',monospace;
+}
+.log-entry:last-child { border-bottom:none; }
+.log-system { color:var(--dim); }
+.log-scan { color:#1d4ed8; background:#eff6ff; }
+.log-story { color:#6d28d9; background:#f5f3ff; }
+.log-dialogue { color:#065f46; background:#f0fdf4; }
+.log-error { color:var(--red); background:#fef2f2; }
+
+/* MAP PANEL */
+.map-panel { padding:20px; }
+.map-canvas {
+  width:100%; aspect-ratio:16/9; background:#f5f2ed;
+  border:1px solid var(--border); border-radius:12px; position:relative; overflow:hidden;
+}
+.map-zone {
+  position:absolute; border-radius:6px; border:1px solid;
+  display:flex; align-items:center; justify-content:center;
+  font-size:9px; font-weight:700; letter-spacing:1px; text-transform:uppercase;
+}
+.map-bot {
+  position:absolute; transform:translate(-50%,-50%);
+  text-align:center; z-index:5; transition:left 1.5s ease, top 1.5s ease;
+}
+.map-bot-icon {
+  width:34px; height:34px; border-radius:50%; background:var(--card);
+  border:2px solid; display:flex; align-items:center; justify-content:center;
+  font-size:16px; margin:0 auto; box-shadow:0 2px 8px rgba(0,0,0,0.08);
+}
+.map-bot-name { font-size:8px; font-weight:700; margin-top:3px; white-space:nowrap; }
+
+/* MESH LOG */
+.mesh-panel { padding:16px; }
+.mesh-entry {
+  padding:8px 12px; background:var(--card); border:1px solid var(--border);
+  border-radius:6px; font-size:12px; color:var(--muted); margin-bottom:6px;
+}
+
+/* MODAL */
+.modal-overlay {
+  position:fixed; inset:0; background:rgba(26,24,20,0.6);
+  display:flex; align-items:center; justify-content:center; z-index:100; padding:24px;
+}
+.modal {
+  background:var(--card); border-radius:16px; padding:36px; max-width:520px;
+  width:100%; box-shadow:0 20px 60px rgba(0,0,0,0.15);
+}
+.modal-icon { font-size:48px; text-align:center; margin-bottom:16px; }
+.modal-title { font-family:'DM Serif Display',serif; font-size:1.6rem; text-align:center; margin-bottom:12px; }
+.modal-body { font-size:14px; color:var(--muted); line-height:1.7; font-style:italic; text-align:center; }
+.modal-btn {
+  display:block; width:100%; margin-top:24px; padding:12px;
+  background:var(--text); color:#fff; border:none; border-radius:8px;
+  font-size:14px; font-weight:600; cursor:pointer;
+}
 </style>
 </head>
 <body>
 
 <!-- STATUS BAR -->
-<div id="statusBar" style="background:#1a1814;color:#aaa;font-size:11px;font-family:'SF Mono','Fira Code',monospace;padding:6px 24px;display:flex;gap:20px;align-items:center">
-  <span style="color:#555">SPECTER</span>
-  <span id="sk-nebius">⬜ Nebius</span>
-  <span id="sk-tavily">⬜ Tavily</span>
-  <span id="sk-minimax">⬜ MiniMax</span>
-  <span style="margin-left:auto;color:#555" id="sk-stack">stack: —</span>
+<div class="statusbar">
+  <svg width="16" height="16" viewBox="0 0 96 96" style="opacity:0.4"><path d="M12 48 C24 24 72 24 84 48 C72 72 24 72 12 48Z" stroke="white" stroke-width="3" fill="none"/><circle cx="48" cy="48" r="12" stroke="white" stroke-width="3" fill="none"/><circle cx="48" cy="48" r="4" fill="white"/></svg>
+  SPECTER
+  <span class="sk"><span class="sk-dot" id="dot-nebius"></span><span id="lbl-nebius">Nebius</span></span>
+  <span class="sk"><span class="sk-dot" id="dot-tavily"></span><span id="lbl-tavily">Tavily</span></span>
+  <span style="margin-left:auto;color:#444" id="lbl-stack">stack: —</span>
 </div>
 
 <!-- HEADER -->
 <div class="header">
-  <div class="header-logo">🔮</div>
+  <svg class="header-logo" viewBox="0 0 96 96" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <circle cx="48" cy="48" r="44" stroke="#1a1814" stroke-width="1.5" opacity="0.12"/>
+    <path d="M12 48 C24 24 72 24 84 48 C72 72 24 72 12 48Z" stroke="#1a1814" stroke-width="1.5" fill="none" opacity="0.5"/>
+    <circle cx="48" cy="48" r="14" stroke="#1a1814" stroke-width="1.5" fill="none"/>
+    <circle cx="48" cy="48" r="5" fill="#1a1814"/>
+    <circle cx="53" cy="43" r="2" fill="#1a1814" opacity="0.4"/>
+  </svg>
   <div>
-    <div class="header-title">SPECTER</div>
-    <div class="header-sub">Space Perception Engine for Crime, Theater, and Exploration Research · Nebius.Build SF 2026</div>
+    <span class="header-title">SPECTER</span>
+    <span class="header-sub">Space Perception Engine</span>
   </div>
-  <div class="header-stack" id="stackBadges">
-    <span class="stack-badge" style="color:#76b900;border-color:#76b900">NVIDIA NIM</span>
-    <span class="stack-badge" style="color:#4a7cf7;border-color:#4a7cf7">Nebius</span>
-    <span class="stack-badge" style="color:#14b8a6;border-color:#14b8a6">Tavily</span>
-    <span class="stack-badge" style="color:#a855f7;border-color:#a855f7">Oumi</span>
-    <span class="stack-badge" style="color:#ec4899;border-color:#ec4899">MiniMax</span>
+  <div class="header-mode">
+    <button class="mode-btn active" id="btn-mystery" onclick="setMode('mystery')">🔍 Mystery</button>
+    <button class="mode-btn" id="btn-forensics" onclick="setMode('forensics')">🔬 Forensics</button>
   </div>
 </div>
 
+<!-- MAIN -->
 <div class="main">
 
   <!-- SIDEBAR -->
   <div class="sidebar">
-
     <div class="sidebar-section">
-      <div class="sidebar-label">Controls</div>
-      <button class="btn btn-nvidia" onclick="doScan()">📸 Scan Space</button>
-      <button class="btn btn-primary" onclick="generateStory('sherlock')">🔍 Sherlock Mystery</button>
-      <button class="btn btn-outline" onclick="generateStory('generic')">✨ Generic Story</button>
-      <button class="btn btn-outline" onclick="resetAll()">🔄 Reset</button>
+      <div class="sidebar-label">Actions</div>
+      <button class="btn btn-outline" onclick="doScan()">📸 Scan Space</button>
+      <button class="btn btn-primary" id="btn-generate" onclick="generateStory()">🔍 Generate Mystery</button>
+      <button class="btn btn-outline" onclick="resetAll()" style="margin-top:10px;font-size:12px">↺ Reset</button>
     </div>
 
     <div class="sidebar-section">
-      <div class="sidebar-label">Robots</div>
-      <div id="robotList">
-        <div style="color:var(--dim);font-size:12px">No characters assigned yet</div>
-      </div>
+      <div class="sidebar-label">Characters</div>
+      <div id="robotList"><div style="color:var(--dim);font-size:12px">Generate a mystery to assign characters</div></div>
     </div>
 
-    <div class="sidebar-section">
+    <div class="sidebar-section" style="flex:1">
       <div class="sidebar-label">Clues Collected</div>
-      <div id="cluesList" style="color:var(--dim);font-size:12px">Interact with robots to collect clues...</div>
+      <div id="cluesList" style="color:var(--dim);font-size:12px">Talk to robots to collect clues...</div>
     </div>
-
   </div>
 
   <!-- CONTENT -->
   <div class="content">
-
     <div class="tabs">
       <div class="tab active" onclick="switchTab('world')">🌍 World</div>
-      <div class="tab" onclick="switchTab('map')">🗺 SHACK15</div>
-      <div class="tab" onclick="switchTab('scan')">📸 Scan</div>
+      <div class="tab" onclick="switchTab('map')">🗺 Map</div>
       <div class="tab" onclick="switchTab('log')">📋 Log</div>
     </div>
 
-    <!-- WORLD PANEL -->
+    <!-- WORLD -->
     <div class="panel active" id="panel-world">
-      <div class="story-panel" id="storyPanel">
-        <div style="color:var(--dim);font-size:14px;margin-top:32px;text-align:center">
-          <div style="font-size:48px;margin-bottom:16px">🔮</div>
-          Scan the space, then generate a story world.<br>
-          Robots will become characters. Visitors solve the mystery.
+      <div class="world-panel" id="worldContent">
+        <div class="story-empty">
+          <svg class="story-empty-icon" viewBox="0 0 96 96" fill="none">
+            <path d="M12 48 C24 24 72 24 84 48 C72 72 24 72 12 48Z" stroke="#1a1814" stroke-width="3" fill="none"/>
+            <circle cx="48" cy="48" r="14" stroke="#1a1814" stroke-width="3" fill="none"/>
+            <circle cx="48" cy="48" r="5" fill="#1a1814"/>
+          </svg>
+          <div style="font-family:'DM Serif Display',serif;font-size:1.4rem;margin-bottom:8px">Scan the space first</div>
+          <div style="font-size:13px">Click 📸 Scan Space, then Generate Mystery.</div>
         </div>
       </div>
-      <div class="interact-panel" id="interactPanel" style="display:none">
-        <select id="robotSelect" style="background:var(--card);border:1px solid var(--border);border-radius:8px;padding:10px;color:var(--cream);font-size:13px">
-          <option>Select robot...</option>
-        </select>
-        <input class="interact-input" id="visitorMsg" placeholder="Speak to this robot..." onkeydown="if(event.key==='Enter')sendMessage()">
-        <button class="btn btn-primary" style="width:auto;padding:10px 20px" onclick="sendMessage()">Send</button>
-        <button class="btn btn-outline" style="width:auto;padding:10px 16px" onclick="submitSolution()" title="Submit your solution">🎯</button>
+      <div class="interact-bar hidden" id="interactBar">
+        <select class="interact-select" id="robotSelect"><option>Select character...</option></select>
+        <input class="interact-input" id="visitorMsg" placeholder="Speak to this character..." onkeydown="if(event.key==='Enter')sendMessage()">
+        <button class="interact-send" onclick="sendMessage()">Send</button>
+        <button class="solve-btn" onclick="submitSolution()" title="Submit your solution">🎯 Solve</button>
       </div>
     </div>
 
-    <!-- SHACK15 MAP PANEL -->
+    <!-- MAP -->
     <div class="panel" id="panel-map">
-      <div style="padding:24px">
-        <div style="color:#555;font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;margin-bottom:12px">SHACK15 — Ferry Building, SF · Mirror World</div>
-        <div style="position:relative;width:100%;aspect-ratio:16/9;background:#0d0d0d;border:1px solid #222;border-radius:12px;overflow:hidden" id="mapCanvas">
-          <!-- SHACK15 layout -->
-          <div style="position:absolute;inset:0;opacity:0.15">
-            <!-- Bay windows top -->
-            <div style="position:absolute;top:5%;left:10%;right:10%;height:12%;background:#4a7cf7;border-radius:4px;display:flex;align-items:center;justify-content:center;font-size:10px;color:#fff">🌊 BAY VIEW WINDOWS</div>
-            <!-- Main hall -->
-            <div style="position:absolute;top:25%;left:5%;right:5%;height:40%;background:#222;border-radius:4px;border:1px solid #333"></div>
-            <!-- Bar right -->
-            <div style="position:absolute;top:65%;right:5%;width:20%;height:25%;background:#333;border-radius:4px;display:flex;align-items:center;justify-content:center;font-size:10px;color:#fff">🍸 BAR</div>
-            <!-- Stage center -->
-            <div style="position:absolute;top:55%;left:40%;width:25%;height:15%;background:#df3836;border-radius:4px;display:flex;align-items:center;justify-content:center;font-size:10px;color:#fff">STAGE</div>
-            <!-- Entrance -->
-            <div style="position:absolute;bottom:5%;left:5%;width:15%;height:15%;background:#444;border-radius:4px;display:flex;align-items:center;justify-content:center;font-size:10px;color:#fff">↑ IN</div>
-          </div>
-
-          <!-- Zone labels -->
-          <div style="position:absolute;top:8%;left:50%;transform:translateX(-50%);font-size:10px;color:#4a7cf7;font-weight:600">BAY VIEW</div>
-          <div style="position:absolute;top:35%;left:35%;font-size:10px;color:#555">MAIN HACKING AREA</div>
-          <div style="position:absolute;top:55%;left:55%;font-size:10px;color:#df3836">DEMO STAGE</div>
-          <div style="position:absolute;top:72%;right:8%;font-size:10px;color:#888">BAR</div>
-          <div style="position:absolute;bottom:8%;left:8%;font-size:10px;color:#888">ENTRANCE</div>
-
-          <!-- Robot markers (positioned by JS) -->
-          <div id="mapRobots"></div>
-
-          <!-- Watson marker -->
-          <div id="watsonMarker" style="position:absolute;display:none;transform:translate(-50%,-50%);z-index:10">
-            <div style="width:28px;height:28px;border-radius:50%;background:#faf8f5;border:2px solid #df3836;display:flex;align-items:center;justify-content:center;font-size:14px">🧑</div>
-            <div style="text-align:center;font-size:9px;color:#df3836;font-weight:700;margin-top:2px">WATSON</div>
-          </div>
+      <div class="map-panel">
+        <div style="font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--dim);margin-bottom:12px">SHACK15 — Ferry Building, SF · Mirror World</div>
+        <div class="map-canvas" id="mapCanvas">
+          <!-- Zones -->
+          <div class="map-zone" style="top:5%;left:15%;right:15%;height:13%;border-color:#bfdbfe;background:#eff6ff;color:#1d4ed8">🌊 Bay View</div>
+          <div class="map-zone" style="top:28%;left:5%;width:52%;height:35%;border-color:#e5e7eb;background:rgba(0,0,0,0.02);color:#9ca3af">Main Hacking Area</div>
+          <div class="map-zone" style="top:62%;right:5%;width:19%;height:26%;border-color:#e5e7eb;background:rgba(0,0,0,0.02);color:#9ca3af">🍸 Bar</div>
+          <div class="map-zone" style="top:55%;left:40%;width:22%;height:12%;border-color:#fde68a;background:#fffbeb;color:#b45309">Stage</div>
+          <div class="map-zone" style="bottom:5%;left:5%;width:13%;height:13%;border-color:#e5e7eb;background:rgba(0,0,0,0.02);color:#9ca3af">↑ In</div>
+          <div id="mapBots"></div>
         </div>
-
-        <!-- Visitor sensing -->
-        <div style="margin-top:16px;background:#141414;border:1px solid #222;border-radius:10px;padding:16px" id="visitorPanel">
-          <div style="font-size:10px;font-weight:700;letter-spacing:2px;color:#76b900;margin-bottom:8px">👁 VISITOR PROFILE (NIM Vision)</div>
-          <div id="visitorProfile" style="color:#555;font-size:12px">No visitor detected yet.</div>
+        <div style="margin-top:16px;background:var(--card);border:1px solid var(--border);border-radius:10px;padding:14px">
+          <div class="sidebar-label">Visitor Profile</div>
+          <div id="visitorProfile" style="color:var(--dim);font-size:12px">No visitor detected yet.</div>
         </div>
-
-        <!-- Water cooler activity -->
-        <div style="margin-top:12px;background:#141414;border:1px solid #222;border-radius:10px;padding:16px">
-          <div style="font-size:10px;font-weight:700;letter-spacing:2px;color:#a855f7;margin-bottom:8px">💬 ROBOT MESH ACTIVITY</div>
-          <div id="meshLog" style="color:#555;font-size:12px;max-height:80px;overflow-y:auto">Robots standing by...</div>
+        <div style="margin-top:10px;background:var(--card);border:1px solid var(--border);border-radius:10px;padding:14px">
+          <div class="sidebar-label">Robot Mesh</div>
+          <div id="meshLog" style="color:var(--dim);font-size:12px;max-height:80px;overflow-y:auto">Standing by...</div>
         </div>
       </div>
     </div>
 
-    <!-- SCAN PANEL -->
-    <div class="panel" id="panel-scan">
-      <div style="padding:24px">
-        <div class="scan-viz" id="scanViz">📷</div>
-        <div id="scanResults" style="color:var(--dim);font-size:13px">No scans yet. Click "Scan Space" to begin.</div>
-      </div>
-    </div>
-
-    <!-- LOG PANEL -->
+    <!-- LOG -->
     <div class="panel" id="panel-log">
-      <div class="log" id="logEntries">
-        <div class="log-entry log-system">System ready. Scan the space to begin.</div>
+      <div class="log-panel" id="logEntries">
+        <div class="log-entry log-system">System ready.</div>
       </div>
     </div>
 
@@ -296,284 +335,203 @@ body { background:var(--bg); color:var(--cream); font-family:'DM Sans',system-ui
 </div>
 
 <script>
-  let ws;
-  let story = null;
-  let activeTab = 'world';
+let ws, story = null, mode = 'mystery';
 
-  function connect() {
-    const proto = location.protocol === 'https:' ? 'wss' : 'ws';
-    ws = new WebSocket(`${proto}://${location.host}/ws`);
-    ws.onmessage = e => handleMsg(JSON.parse(e.data));
-    ws.onclose = () => setTimeout(connect, 2000);
-    ws.onerror = () => ws.close();
+const ZONE_POS = {
+  entrance:{x:8,y:86}, main_hall:{x:35,y:48}, bay_view:{x:70,y:13},
+  bar:{x:86,y:76}, robot_lab:{x:28,y:78}, stage:{x:55,y:63},
+};
+const ROLE_COLOR = {detective:'#6366f1',suspect:'#c93030',witness:'#2563eb',guide:'#059669'};
+const ROLE_EMOJI = {detective:'🕵️',suspect:'😰',witness:'👁',guide:'🤖'};
+
+function connect() {
+  const proto = location.protocol === 'https:' ? 'wss' : 'ws';
+  ws = new WebSocket(`${proto}://${location.host}/ws`);
+  ws.onmessage = e => handle(JSON.parse(e.data));
+  ws.onclose = () => setTimeout(connect, 2000);
+}
+
+function handle(d) {
+  if (d.type === 'log') addLog(d.msg, 'system');
+  else if (d.type === 'scan_result') { addLog(`📸 Scanned: ${d.result.room_type}`, 'scan'); }
+  else if (d.type === 'story_ready') { story = d; renderStory(d); addLog(`🎭 "${d.title}"`, 'story'); }
+  else if (d.type === 'watson_intro') showModal('🔍', 'The Game is Afoot', d.text, 'Begin Investigation');
+  else if (d.type === 'dialogue') { addLog(`[${d.character}] ${d.character_said}`, 'dialogue'); setRobotSpeaking(d.robot_id); }
+  else if (d.type === 'solution_correct') showModal('✅', 'Elementary!', d.response, 'Close');
+  else if (d.type === 'solution_wrong') showModal('🔍', 'Not Quite, Watson', d.response, 'Keep Investigating');
+  else if (d.type === 'robot_move') { addMeshLog(`🚶 ${d.character} → ${d.zone_label}`); updateBotPos(d.robot_id, d.position); }
+  else if (d.type === 'mesh_whisper') addMeshLog(`💬 ${d.from}: "${d.text}"`);
+  else if (d.type === 'visitor_profile') renderVisitor(d.profile);
+}
+
+function addLog(msg, kind='system') {
+  const el = document.createElement('div');
+  el.className = `log-entry log-${kind}`;
+  el.textContent = msg;
+  const log = document.getElementById('logEntries');
+  log.appendChild(el);
+  log.scrollTop = log.scrollHeight;
+}
+
+function switchTab(name) {
+  document.querySelectorAll('.tab').forEach((t,i) => t.classList.toggle('active', ['world','map','log'][i]===name));
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+  document.getElementById(`panel-${name}`).classList.add('active');
+}
+
+function setMode(m) {
+  mode = m;
+  document.getElementById('btn-mystery').classList.toggle('active', m==='mystery');
+  document.getElementById('btn-forensics').classList.toggle('active', m==='forensics');
+  document.getElementById('btn-generate').textContent = m==='mystery' ? '🔍 Generate Mystery' : '🔬 Document Scene';
+}
+
+function doScan() {
+  const p = prompt('Image path (leave empty for demo mode):', '');
+  addLog('📸 Scanning space...', 'scan');
+  ws.send(JSON.stringify({action:'scan', image_path:p||'', location:'SHACK15 main area'}));
+  switchTab('log');
+}
+
+function generateStory() {
+  addLog(`✨ Generating ${mode} scenario...`, 'story');
+  ws.send(JSON.stringify({action:'generate_story', mode, num_robots:3, robot_ids:['robot_0','robot_1','robot_2']}));
+}
+
+function renderStory(data) {
+  const w = document.getElementById('worldContent');
+  w.innerHTML = `
+    <div class="story-title">${data.title||'Untitled'}</div>
+    <div class="story-premise">${data.premise||''}</div>
+    <div class="mystery-box">
+      <div class="mystery-label">🔍 THE MYSTERY</div>
+      ${data.mystery||''}
+    </div>`;
+
+  const rl = document.getElementById('robotList');
+  const rs = document.getElementById('robotSelect');
+  rl.innerHTML = ''; rs.innerHTML = '<option>Select character...</option>';
+
+  (data.characters||[]).forEach(c => {
+    const col = ROLE_COLOR[c.role]||'#6366f1';
+    const card = document.createElement('div');
+    card.className = 'robot-card'; card.id = `rc-${c.robot_id}`;
+    card.onclick = () => { rs.value = c.robot_id; switchTab('world'); };
+    card.innerHTML = `<div class="robot-header">
+      <div class="robot-avatar">${ROLE_EMOJI[c.role]||'🤖'}</div>
+      <div>
+        <div class="robot-name">${c.name}</div>
+        <div class="robot-role" style="color:${col}">${c.role}</div>
+        <div class="robot-zone" id="zone-${c.robot_id}">—</div>
+      </div></div>`;
+    rl.appendChild(card);
+    const o = document.createElement('option');
+    o.value = c.robot_id; o.textContent = `${c.name} (${c.role})`;
+    rs.appendChild(o);
+
+    // Place on map
+    const zk = {detective:'bay_view',suspect:'bar',witness:'main_hall',guide:'entrance'}[c.role]||'main_hall';
+    placeBot(c.robot_id, c.name, c.role, zk);
+  });
+
+  document.getElementById('interactBar').classList.remove('hidden');
+}
+
+function sendMessage() {
+  const rid = document.getElementById('robotSelect').value;
+  const msg = document.getElementById('visitorMsg').value.trim();
+  if (!msg || rid.includes('Select')) return;
+  addLog(`👤 → ${msg}`, 'dialogue');
+  document.getElementById('visitorMsg').value = '';
+  ws.send(JSON.stringify({action:'interact', robot_id:rid, message:msg}));
+}
+
+function submitSolution() {
+  const guess = prompt('🎯 Name the culprit, Watson:');
+  if (!guess) return;
+  const rid = document.getElementById('robotSelect').value;
+  ws.send(JSON.stringify({action:'interact', robot_id:rid||'robot_0', message:`The culprit is: ${guess}`}));
+}
+
+function setRobotSpeaking(rid) {
+  document.querySelectorAll('.robot-card').forEach(c => c.classList.remove('speaking'));
+  const c = document.getElementById(`rc-${rid}`);
+  if (c) { c.classList.add('speaking'); setTimeout(()=>c.classList.remove('speaking'),4000); }
+}
+
+function resetAll() { addLog('↺ Resetting...', 'system'); location.reload(); }
+
+// MAP
+function placeBot(rid, name, role, zone) {
+  const map = document.getElementById('mapBots');
+  let el = document.getElementById(`mb-${rid}`);
+  if (!el) {
+    el = document.createElement('div'); el.id = `mb-${rid}`; el.className = 'map-bot';
+    el.onclick = () => { document.getElementById('robotSelect').value = rid; switchTab('world'); };
+    map.appendChild(el);
   }
+  const pos = ZONE_POS[zone]||{x:50,y:50};
+  el.style.left = pos.x+'%'; el.style.top = pos.y+'%';
+  const col = ROLE_COLOR[role]||'#6366f1';
+  el.innerHTML = `<div class="map-bot-icon" style="border-color:${col}">${ROLE_EMOJI[role]||'🤖'}</div><div class="map-bot-name" style="color:${col}">${name}</div>`;
+  const zl = document.getElementById(`zone-${rid}`);
+  if (zl) zl.textContent = zone.replace('_',' ');
+}
 
-  function handleMsg(data) {
-    if (data.type === 'log') {
-      addLog(data.msg, 'system');
-    } else if (data.type === 'scan_result') {
-      addLog(`📸 Scanned: ${data.result.room_type} — ${data.result.objects?.slice(0,4).join(', ')}`, 'scan');
-      renderScanResult(data.result);
-    } else if (data.type === 'story_ready') {
-      story = data;
-      renderStory(data);
-      addLog(`🎭 Story: "${data.title}"`, 'story');
-    } else if (data.type === 'dialogue') {
-      addLog(`[${data.character}] ${data.character_said}`, 'dialogue');
-      setRobotSpeaking(data.robot_id);
-    } else if (data.type === 'watson_intro') {
-      showWatsonIntro(data.text);
-    } else if (data.type === 'solution_correct') {
-      showSolution(data.response, true);
-    } else if (data.type === 'solution_wrong') {
-      showSolution(data.response, false);
-    }
-  }
+function updateBotPos(rid, pos) {
+  const el = document.getElementById(`mb-${rid}`);
+  if (!el || !pos.zone) return;
+  const p = ZONE_POS[pos.zone]||{x:50,y:50};
+  el.style.left = p.x+'%'; el.style.top = p.y+'%';
+}
 
-  function addLog(msg, kind='system') {
-    const el = document.createElement('div');
-    el.className = `log-entry log-${kind}`;
-    el.textContent = msg;
-    const log = document.getElementById('logEntries');
-    log.appendChild(el);
-    log.scrollTop = log.scrollHeight;
-  }
+function addMeshLog(msg) {
+  const el = document.getElementById('meshLog');
+  el.innerHTML = `<div style="margin-bottom:4px;color:var(--accent)">${msg}</div>` + el.innerHTML;
+}
 
-  function switchTab(name) {
-    activeTab = name;
-    document.querySelectorAll('.tab').forEach((t,i) => {
-      t.classList.toggle('active', ['world','scan','log'][i] === name);
+function renderVisitor(p) {
+  if (!p) return;
+  document.getElementById('visitorProfile').innerHTML = `
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;font-size:12px">
+      <div><span style="color:var(--dim)">Mood:</span> <strong>${p.mood||'?'}</strong></div>
+      <div><span style="color:var(--dim)">Engagement:</span> <strong>${p.engagement||'?'}</strong></div>
+      <div style="grid-column:1/-1;font-style:italic;color:var(--muted)">"${p.deduction||''}"</div>
+    </div>`;
+}
+
+// MODAL
+function showModal(icon, title, body, btnText) {
+  const m = document.createElement('div'); m.className = 'modal-overlay';
+  m.innerHTML = `<div class="modal">
+    <div class="modal-icon">${icon}</div>
+    <div class="modal-title">${title}</div>
+    <div class="modal-body">"${body}"</div>
+    <button class="modal-btn" onclick="this.closest('.modal-overlay').remove()">${btnText}</button>
+  </div>`;
+  document.body.appendChild(m);
+}
+
+// KEY STATUS
+async function checkKeys() {
+  try {
+    const r = await fetch('/status'); const d = await r.json();
+    const keys = d.keys||{};
+    ['nebius','tavily'].forEach(k => {
+      const dot = document.getElementById(`dot-${k}`);
+      const lbl = document.getElementById(`lbl-${k}`);
+      if (!dot) return;
+      const ok = keys[k]==='ok';
+      dot.className = 'sk-dot ' + (ok?'ok':'err');
+      if (lbl) lbl.style.color = ok ? '#22c55e' : '#ef4444';
     });
-    document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
-    document.getElementById(`panel-${name}`).classList.add('active');
-  }
+    const stack = document.getElementById('lbl-stack');
+    if (stack) stack.textContent = `stack: ${d.stack||'auto'}`;
+  } catch(e){}
+}
 
-  function doScan() {
-    const imagePath = prompt('Image path (or leave empty for demo mode):', '/tmp/lore/scan.jpg');
-    document.getElementById('scanViz').classList.add('scanning');
-    addLog('📸 Scanning space...', 'scan');
-    ws.send(JSON.stringify({ action: 'scan', image_path: imagePath || '', location: 'main area' }));
-    setTimeout(() => document.getElementById('scanViz').classList.remove('scanning'), 5000);
-    switchTab('scan');
-  }
-
-  function generateStory(mode='sherlock') {
-    const label = mode === 'sherlock' ? '🔍 Generating Sherlock mystery...' : '✨ Generating story world...';
-    addLog(label, 'story');
-    ws.send(JSON.stringify({ action: 'generate_story', mode, num_robots: 3, robot_ids: ['robot_0','robot_1','robot_2'] }));
-  }
-
-  function showWatsonIntro(text) {
-    const modal = document.createElement('div');
-    modal.style.cssText = `position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:100;display:flex;align-items:center;justify-content:center;padding:24px`;
-    modal.innerHTML = `
-      <div style="background:#141414;border:1px solid #76b900;border-radius:16px;padding:40px;max-width:560px;text-align:center">
-        <div style="font-size:48px;margin-bottom:16px">🔍</div>
-        <div style="font-family:'DM Serif Display',serif;font-size:1.4rem;color:#faf8f5;margin-bottom:16px">A New Case Begins</div>
-        <div style="color:#aaa;font-size:15px;line-height:1.8;font-style:italic">"${text}"</div>
-        <button onclick="this.parentElement.parentElement.remove()" style="margin-top:24px;padding:12px 28px;background:#df3836;color:#fff;border:none;border-radius:8px;font-size:14px;font-weight:600;cursor:pointer">Begin Investigation →</button>
-      </div>`;
-    document.body.appendChild(modal);
-  }
-
-  function showSolution(text, correct) {
-    const color = correct ? '#76b900' : '#df3836';
-    const icon = correct ? '✅' : '🔍';
-    const modal = document.createElement('div');
-    modal.style.cssText = `position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:100;display:flex;align-items:center;justify-content:center;padding:24px`;
-    modal.innerHTML = `
-      <div style="background:#141414;border:1px solid ${color};border-radius:16px;padding:40px;max-width:560px;text-align:center">
-        <div style="font-size:48px;margin-bottom:16px">${icon}</div>
-        <div style="color:${color};font-size:15px;line-height:1.8;font-style:italic">"${text}"</div>
-        <button onclick="this.parentElement.parentElement.remove()" style="margin-top:24px;padding:12px 28px;background:${color};color:#000;border:none;border-radius:8px;font-size:14px;font-weight:600;cursor:pointer">Continue</button>
-      </div>`;
-    document.body.appendChild(modal);
-  }
-
-  // Solution form
-  function submitSolution() {
-    const guess = prompt('🔍 Name the culprit, Watson!\n\n"I believe the culprit is..."');
-    if (!guess) return;
-    const robotId = document.getElementById('robotSelect').value;
-    ws.send(JSON.stringify({ action: 'interact', robot_id: robotId || 'robot_0', message: `The culprit is: ${guess}` }));
-  }
-
-  function renderStory(data) {
-    const panel = document.getElementById('storyPanel');
-    panel.innerHTML = `
-      <div class="story-title">${data.title}</div>
-      <div class="story-premise">${data.premise || ''}</div>
-      <div class="story-mystery">
-        <div class="mystery-label">🔍 THE MYSTERY</div>
-        ${data.mystery}
-      </div>
-    `;
-
-    // Render robots
-    const robotList = document.getElementById('robotList');
-    const robotSelect = document.getElementById('robotSelect');
-    robotList.innerHTML = '';
-    robotSelect.innerHTML = '<option>Select robot...</option>';
-
-    const emojis = { detective:'🕵️', suspect:'😰', witness:'👁', guide:'🤖' };
-    data.characters?.forEach(c => {
-      const card = document.createElement('div');
-      card.className = 'robot-card';
-      card.id = `robot-${c.robot_id}`;
-      card.innerHTML = `
-        <div class="robot-header">
-          <div class="avatar">${emojis[c.role] || '🤖'}</div>
-          <div>
-            <div class="robot-name">${c.name}</div>
-            <div class="robot-role">${c.role} · ${c.robot_id}</div>
-            <div class="robot-status" style="color:var(--teal)">● ready</div>
-          </div>
-        </div>`;
-      robotList.appendChild(card);
-      const opt = document.createElement('option');
-      opt.value = c.robot_id;
-      opt.textContent = `${c.name} (${c.role})`;
-      robotSelect.appendChild(opt);
-    });
-
-    document.getElementById('interactPanel').style.display = 'flex';
-    switchTab('world');
-  }
-
-  function renderScanResult(result) {
-    const el = document.getElementById('scanResults');
-    el.innerHTML = `
-      <div style="color:var(--cream);font-weight:600;margin-bottom:8px">${result.room_type}</div>
-      <div style="color:var(--dim);margin-bottom:8px">${result.atmosphere}</div>
-      <div style="display:flex;flex-wrap:wrap;gap:6px">
-        ${(result.objects||[]).map(o=>`<span style="background:var(--card);border:1px solid var(--border);border-radius:4px;padding:3px 8px;font-size:11px">${o}</span>`).join('')}
-      </div>
-      <div style="margin-top:12px;color:var(--nvidia);font-size:12px">
-        ⭐ ${(result.interesting||[]).join(' · ')}
-      </div>`;
-  }
-
-  function sendMessage() {
-    const robotId = document.getElementById('robotSelect').value;
-    const msg = document.getElementById('visitorMsg').value.trim();
-    if (!msg || robotId === 'Select robot...') return;
-    addLog(`👤 → [${robotId}]: ${msg}`, 'dialogue');
-    document.getElementById('visitorMsg').value = '';
-    ws.send(JSON.stringify({ action: 'interact', robot_id: robotId, message: msg }));
-  }
-
-  function setRobotSpeaking(robotId) {
-    document.querySelectorAll('.robot-card').forEach(c => c.classList.remove('speaking'));
-    const card = document.getElementById(`robot-${robotId}`);
-    if (card) {
-      card.classList.add('speaking');
-      setTimeout(() => card.classList.remove('speaking'), 4000);
-    }
-  }
-
-  function resetAll() {
-    fetch('/status').then(r=>r.json()).then(d => console.log(d));
-    addLog('🔄 Reset requested', 'system');
-  }
-
-  // ── SHACK15 MAP ──────────────────────────────────────────────────────────
-  const ZONE_POSITIONS = {
-    entrance:  { x: 8,  y: 85 },
-    main_hall: { x: 40, y: 50 },
-    bay_view:  { x: 70, y: 12 },
-    bar:       { x: 85, y: 78 },
-    robot_lab: { x: 30, y: 78 },
-    stage:     { x: 55, y: 62 },
-  };
-
-  const ROLE_EMOJI = { detective: '🕵️', suspect: '😰', witness: '👁', guide: '🤖' };
-  const ROLE_COLOR = { detective: '#76b900', suspect: '#df3836', witness: '#4a7cf7', guide: '#a855f7' };
-
-  let mapRobots = {};
-
-  function renderRobotOnMap(robotId, character, role, position) {
-    const map = document.getElementById('mapRobots');
-    let el = document.getElementById(`mapbot-${robotId}`);
-    if (!el) {
-      el = document.createElement('div');
-      el.id = `mapbot-${robotId}`;
-      el.style.cssText = 'position:absolute;transform:translate(-50%,-50%);z-index:5;transition:left 1s ease,top 1s ease;cursor:pointer;';
-      el.onclick = () => { document.getElementById('robotSelect').value = robotId; switchTab('world'); };
-      map.appendChild(el);
-    }
-    const zone = position?.zone ? ZONE_POSITIONS[position.zone] : null;
-    const x = zone ? zone.x : (position?.x || 0.5) * 100;
-    const y = zone ? zone.y : (position?.y || 0.5) * 100;
-    el.style.left = x + '%';
-    el.style.top = y + '%';
-    const color = ROLE_COLOR[role] || '#888';
-    el.innerHTML = `
-      <div style="width:36px;height:36px;border-radius:50%;background:#141414;border:2px solid ${color};display:flex;align-items:center;justify-content:center;font-size:18px">${ROLE_EMOJI[role]||'🤖'}</div>
-      <div style="text-align:center;font-size:8px;color:${color};font-weight:700;margin-top:2px;white-space:nowrap">${character}</div>`;
-    mapRobots[robotId] = { character, role, x, y };
-  }
-
-  function handleRobotMove(data) {
-    addMeshLog(`🚶 ${data.character} moves to ${data.zone_label}`);
-    renderRobotOnMap(data.robot_id, data.character, 'detective', data.position);
-  }
-
-  function addMeshLog(msg) {
-    const el = document.getElementById('meshLog');
-    el.innerHTML = `<div style="color:#a855f7">${msg}</div>` + el.innerHTML;
-  }
-
-  function renderVisitorProfile(profile) {
-    const el = document.getElementById('visitorProfile');
-    if (!profile) return;
-    el.innerHTML = `
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
-        <div><span style="color:#555">Mood:</span> <span style="color:#76b900;font-weight:600">${profile.mood||'unknown'}</span></div>
-        <div><span style="color:#555">Engagement:</span> <span style="color:#76b900;font-weight:600">${profile.engagement||'?'}</span></div>
-        <div style="grid-column:1/-1"><span style="color:#555">Deduction:</span> <span style="color:#faf8f5;font-style:italic">${profile.deduction||''}</span></div>
-        ${profile.carries?.length ? `<div style="grid-column:1/-1"><span style="color:#555">Carries:</span> ${profile.carries.join(', ')}</div>` : ''}
-      </div>`;
-  }
-
-  // Extend handleMsg to include new event types
-  const _origHandle = handleMsg;
-  handleMsg = function(data) {
-    _origHandle(data);
-    if (data.type === 'robot_move') handleRobotMove(data);
-    if (data.type === 'visitor_profile') renderVisitorProfile(data.profile);
-    if (data.type === 'story_ready') {
-      data.characters?.forEach(c => {
-        const zone = {detective:'bay_view',suspect:'bar',witness:'main_hall',guide:'entrance'}[c.role]||'main_hall';
-        renderRobotOnMap(c.robot_id, c.name, c.role, { zone });
-      });
-      switchTab('map');
-      setTimeout(() => switchTab('world'), 3000);
-    }
-    if (data.type === 'mesh_whisper') addMeshLog(`💬 ${data.from} → ${data.to}: "${data.text}"`);
-  };
-
-  connect();
-
-  // Check key status on load
-  async function checkKeys() {
-    try {
-      const r = await fetch('/status');
-      const d = await r.json();
-      const keys = d.keys || {};
-      const set = (id, val) => {
-        const el = document.getElementById(id);
-        if (!el) return;
-        const ok = val === 'ok';
-        el.textContent = (ok ? '🟢' : '🔴') + ' ' + id.replace('sk-','');
-        el.style.color = ok ? '#22c55e' : '#ef4444';
-      };
-      set('sk-nebius', keys.nebius);
-      set('sk-tavily', keys.tavily);
-      if (keys.minimax) set('sk-minimax', keys.minimax);
-      else document.getElementById('sk-minimax').textContent = '⚪ MiniMax';
-    } catch(e) {}
-  }
-  checkKeys();
+connect();
+checkKeys();
 </script>
 </body>
 </html>

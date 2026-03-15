@@ -14,7 +14,7 @@ import json
 import asyncio
 from pathlib import Path
 from contextlib import asynccontextmanager
-from fastapi import FastAPI, WebSocket, WebSocketDisconnect
+from fastapi import FastAPI, WebSocket, WebSocketDisconnect, Request, UploadFile
 from fastapi.responses import HTMLResponse, JSONResponse
 from fastapi.staticfiles import StaticFiles
 
@@ -52,6 +52,40 @@ async def broadcast(msg: dict):
 # ── HTTP routes ────────────────────────────────────────────────────────────────
 
 TEMPLATE = Path(__file__).parent / "templates" / "index.html"
+
+
+@app.post("/scan/video")
+async def scan_video_upload(request: Request):
+    """Upload a video → extract frames → NIM scans each → rich scene map."""
+    from fastapi import UploadFile
+    import tempfile
+    form = await request.form()
+    video_file = form.get("video")
+    if not video_file:
+        return JSONResponse({"error": "No video file"}, status_code=400)
+
+    suffix = Path(video_file.filename).suffix or ".mp4"
+    with tempfile.NamedTemporaryFile(suffix=suffix, delete=False) as f:
+        content = await video_file.read()
+        f.write(content)
+        tmp_path = f.name
+
+    await broadcast({"type": "log", "msg": f"📽️ Video received ({len(content)//1024}KB) — extracting frames..."})
+
+    from src.scan.video import scan_video, merge_scan_results
+    loop = asyncio.get_event_loop()
+    try:
+        results = await loop.run_in_executor(None, scan_video, tmp_path, 0.5, 6)
+        merged = merge_scan_results(results)
+        _scan_results.extend(results)
+        await broadcast({"type": "scan_result", "result": merged, "count": len(_scan_results), "source": "video"})
+        await broadcast({"type": "log", "msg": f"✅ Video scanned — {len(results)} frames, {len(merged.get('objects',[]))} objects found"})
+        return {"frames_scanned": len(results), "merged": merged}
+    except Exception as e:
+        await broadcast({"type": "log", "msg": f"❌ Video scan failed: {e}"})
+        return JSONResponse({"error": str(e)}, status_code=500)
+    finally:
+        os.unlink(tmp_path)
 
 
 @app.get("/avatar/{role}/{name}")

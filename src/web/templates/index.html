@@ -257,7 +257,13 @@ body { background:var(--bg); color:var(--text); font-family:'DM Sans',system-ui,
     <div class="sidebar-section">
       <div class="sidebar-label">Actions</div>
       <button class="btn btn-primary" id="btn-generate" onclick="generateStory()" style="font-size:15px;padding:14px">🔍 Generate Mystery</button>
-      <button class="btn btn-outline" onclick="doScan()" style="margin-top:6px;font-size:12px">📸 Scan Space (optional)</button>
+      <div style="margin-top:6px;display:flex;gap:6px">
+        <button class="btn btn-outline" onclick="doScan()" style="font-size:12px;flex:1">📸 Photo</button>
+        <label class="btn btn-outline" style="font-size:12px;flex:1;cursor:pointer;text-align:center;padding:9px 0">
+          🎥 Video
+          <input type="file" accept="video/*" style="display:none" onchange="uploadVideo(this)">
+        </label>
+      </div>
       <button class="btn btn-outline" onclick="resetAll()" style="margin-top:6px;font-size:12px">↺ Reset</button>
     </div>
 
@@ -387,6 +393,20 @@ function setMode(m) {
   document.getElementById('btn-mystery').classList.toggle('active', m==='mystery');
   document.getElementById('btn-forensics').classList.toggle('active', m==='forensics');
   document.getElementById('btn-generate').textContent = m==='mystery' ? '🔍 Generate Mystery' : '🔬 Document Scene';
+}
+
+async function uploadVideo(input) {
+  const file = input.files[0];
+  if (!file) return;
+  addLog(`🎥 Uploading ${file.name} (${(file.size/1024/1024).toFixed(1)}MB)...`, 'scan');
+  const fd = new FormData();
+  fd.append('video', file);
+  try {
+    const r = await fetch('/scan/video', {method:'POST', body:fd});
+    const d = await r.json();
+    if (d.error) addLog(`❌ ${d.error}`, 'error');
+    else addLog(`✅ Video scanned — ${d.frames_scanned} frames`, 'scan');
+  } catch(e) { addLog(`❌ Upload failed: ${e}`, 'error'); }
 }
 
 function doScan() {

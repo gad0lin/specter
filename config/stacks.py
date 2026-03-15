@@ -1,9 +1,9 @@
 """
 LORE backend stack presets.
 
-./lore.sh --stack nvidia    → full NVIDIA stack (GTC demo)
-./lore.sh --stack hybrid    → CLI vision + Tavily + MiniMax
-./lore.sh --stack auto      → smart defaults
+./specter.sh --stack nvidia    → full NVIDIA stack (GTC demo)
+./specter.sh --stack hybrid    → CLI vision + Tavily + MiniMax
+./specter.sh --stack auto      → smart defaults
 """
 import os
 

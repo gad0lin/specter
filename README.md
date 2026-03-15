@@ -1,4 +1,4 @@
-# 🔮 LORE — Living Open Robotics Experience
+# 🔮 SPECTER — Space Perception Engine for Crime, Theater, and Exploration Research
 
 > Robots scan a physical space, generate an immersive story from what they find, then each robot *becomes* a character. Visitors walk through and interact to unravel the mystery.
 
@@ -40,13 +40,13 @@ Omniverse renders a real-time digital twin — every robot's position, the space
 
 ```bash
 # Setup
-./lore.sh init
+./specter.sh init
 
 # Scan the space (builds story)
-./lore.sh scan
+./specter.sh scan
 
 # Deploy characters to robots
-./lore.sh deploy
+./specter.sh deploy
 
 # Open mirror world dashboard
 open http://localhost:8888
@@ -57,7 +57,7 @@ open http://localhost:8888
 ## Repo Layout
 
 ```
-lore.sh             ← main entry point
+specter.sh             ← main entry point
 src/
   scan/             ← space scanning + object recognition
   story/            ← story generation + character assignment

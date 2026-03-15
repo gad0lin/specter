@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>LORE — Living Open Robotics Experience</title>
+<title>SPECTER — Space Perception Engine for Crime, Theater, and Exploration Research</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <style>
 :root {
@@ -369,10 +369,10 @@ footer a { color: var(--red); text-decoration: none; }
 <!-- HERO -->
 <section class="hero">
   <div class="hero-eyebrow">Nebius.Build SF 2026 · SHACK15</div>
-  <span class="hero-logo">🔮</span>
-  <h1>LORE</h1>
-  <div class="hero-full">Living Open Robotics Experience</div>
-  <p class="hero-tagline">"Robots scan a space, generate an immersive mystery, and each becomes a character — visitors walk through and solve the case."</p>
+  <span class="hero-logo">👁</span>
+  <h1>SPECTER</h1>
+  <div class="hero-full">Space Perception Engine for Crime, Theater, and Exploration Research</div>
+  <p class="hero-tagline">"Robots that see what humans miss — in a crime scene, a museum, or a mystery game."</p>
   <div class="hero-badges">
     <span class="badge" style="color:#76b900">NVIDIA NIM</span>
     <span class="badge" style="color:#4a7cf7">Nebius GPU</span>
@@ -382,8 +382,54 @@ footer a { color: var(--red); text-decoration: none; }
     <span class="badge" style="color:#f97316">Unitree G1</span>
   </div>
   <div class="cta-row">
-    <a href="https://github.com/gad0lin/lore-robot" class="btn-cta btn-primary">⭐ View on GitHub</a>
+    <a href="https://github.com/gad0lin/specter" class="btn-cta btn-primary">⭐ View on GitHub</a>
     <a href="#concept" class="btn-cta btn-secondary">↓ See the Concept</a>
+  </div>
+</section>
+
+<!-- DUAL MODE SPLIT -->
+<section style="padding:0;border-bottom:1px solid var(--border)">
+  <div style="display:grid;grid-template-columns:1fr 1fr">
+    <div style="padding:64px 48px;border-right:1px solid var(--border);background:rgba(118,185,0,0.03)">
+      <div style="font-size:11px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:var(--nvidia);margin-bottom:16px">Game Mode</div>
+      <div style="font-family:'DM Serif Display',serif;font-size:2rem;margin-bottom:16px">The Mystery</div>
+      <p style="font-size:14px;color:var(--text);line-height:1.8;margin-bottom:24px">Robots become Sherlock Holmes characters. Players collect clues, solve the case. A physical-world RPG where the NPC fleet is a robot fleet. Museums, escape rooms, theme parks, corporate events.</p>
+      <div style="font-size:12px;color:var(--nvidia);font-weight:600">🎭 Entertainment · Gaming · Tourism</div>
+    </div>
+    <div style="padding:64px 48px;background:rgba(223,56,54,0.03)">
+      <div style="font-size:11px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:var(--red);margin-bottom:16px">Forensics Mode</div>
+      <div style="font-family:'DM Serif Display',serif;font-size:2rem;margin-bottom:16px">The Investigation</div>
+      <p style="font-size:14px;color:var(--text);line-height:1.8;margin-bottom:24px">Robots autonomously document a crime scene — object positions, spatial relationships, cross-references. Flags what human investigators miss. Builds a structured, searchable case file from physical reality.</p>
+      <div style="font-size:12px;color:var(--red);font-weight:600">🔍 Law Enforcement · Insurance · Forensics</div>
+    </div>
+  </div>
+</section>
+
+<!-- SAME STACK -->
+<section style="background:#0d0d0d;border-bottom:1px solid var(--border);padding:48px 24px">
+  <div class="container" style="text-align:center">
+    <div style="font-size:11px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:var(--dim);margin-bottom:16px">Same robots. Same stack. Different prompt.</div>
+    <div style="display:flex;align-items:center;justify-content:center;gap:24px;flex-wrap:wrap">
+      <div style="text-align:center">
+        <div style="font-size:32px">🎭</div>
+        <div style="font-size:12px;color:var(--nvidia);font-weight:600;margin-top:6px">Mystery Game</div>
+        <div style="font-size:11px;color:var(--dim)">Generate story from scan</div>
+      </div>
+      <div style="font-size:24px;color:var(--border)">⟷</div>
+      <div style="text-align:center;background:var(--card);padding:16px 24px;border-radius:12px;border:1px solid var(--border)">
+        <div style="font-size:11px;font-weight:700;letter-spacing:2px;color:var(--teal);margin-bottom:8px">SPECTER CORE</div>
+        <div style="font-size:12px;color:var(--text)">👁 NIM Vision scan</div>
+        <div style="font-size:12px;color:var(--text)">🔍 Tavily context</div>
+        <div style="font-size:12px;color:var(--text)">🧠 Llama reasoning</div>
+        <div style="font-size:12px;color:var(--text)">🤖 Robot mesh</div>
+      </div>
+      <div style="font-size:24px;color:var(--border)">⟷</div>
+      <div style="text-align:center">
+        <div style="font-size:32px">🔍</div>
+        <div style="font-size:12px;color:var(--red);font-weight:600;margin-top:6px">Crime Scene</div>
+        <div style="font-size:11px;color:var(--dim)">Generate case file from scan</div>
+      </div>
+    </div>
   </div>
 </section>
 
@@ -596,7 +642,7 @@ footer a { color: var(--red); text-decoration: none; }
           <div class="stack-row"><span class="stack-label">Search</span><span class="stack-val" style="color:#14b8a6">Tavily AI Search</span></div>
           <div class="stack-row"><span class="stack-label">Voice dir</span><span class="stack-val" style="color:#a855f7">Oumi · Llama on Nebius</span></div>
           <div class="stack-row"><span class="stack-label">TTS</span><span class="stack-val" style="color:#ec4899">MiniMax speech-2.8-hd</span></div>
-          <div class="stack-row"><span class="stack-label">Run</span><span class="stack-val" style="color:#76b900">./lore.sh --stack nvidia</span></div>
+          <div class="stack-row"><span class="stack-label">Run</span><span class="stack-val" style="color:#76b900">./specter.sh --stack nvidia</span></div>
         </div>
         <div class="stack-panel" id="stack-hybrid">
           <div class="stack-row"><span class="stack-label">Vision</span><span class="stack-val" style="color:#76b900">NIM · Qwen2-VL-72B</span></div>
@@ -604,23 +650,23 @@ footer a { color: var(--red); text-decoration: none; }
           <div class="stack-row"><span class="stack-label">Search</span><span class="stack-val" style="color:#14b8a6">Tavily AI Search</span></div>
           <div class="stack-row"><span class="stack-label">TTS</span><span class="stack-val" style="color:#ec4899">MiniMax speech-2.8-hd</span></div>
           <div class="stack-row"><span class="stack-label">Cost</span><span class="stack-val" style="color:#22c55e">~$0 (free tiers)</span></div>
-          <div class="stack-row"><span class="stack-label">Run</span><span class="stack-val">./lore.sh --stack hybrid</span></div>
+          <div class="stack-row"><span class="stack-label">Run</span><span class="stack-val">./specter.sh --stack hybrid</span></div>
         </div>
         <div class="stack-panel" id="stack-auto">
           <div class="stack-row"><span class="stack-label">Vision</span><span class="stack-val">NIM → OpenRouter → API fallback</span></div>
           <div class="stack-row"><span class="stack-label">Story LLM</span><span class="stack-val">best available</span></div>
           <div class="stack-row"><span class="stack-label">Search</span><span class="stack-val" style="color:#14b8a6">Tavily → fallback</span></div>
           <div class="stack-row"><span class="stack-label">TTS</span><span class="stack-val" style="color:#ec4899">MiniMax</span></div>
-          <div class="stack-row"><span class="stack-label">Run</span><span class="stack-val">./lore.sh</span></div>
+          <div class="stack-row"><span class="stack-label">Run</span><span class="stack-val">./specter.sh</span></div>
         </div>
       </div>
     </div>
 
     <div class="cmd">
       <div><span class="cmd-comment"># Clone and run</span></div>
-      <div><span class="cmd-prompt">$</span> <span class="cmd-main">git clone</span> <span class="cmd-val">https://github.com/gad0lin/lore-robot</span></div>
-      <div><span class="cmd-prompt">$</span> <span class="cmd-main">./lore.sh</span> <span class="cmd-flag">init</span></div>
-      <div><span class="cmd-prompt">$</span> <span class="cmd-main">./lore.sh</span> <span class="cmd-flag">--stack</span> <span class="cmd-val">nvidia</span> <span class="cmd-flag">--image-path</span> <span class="cmd-val">scan.jpg</span></div>
+      <div><span class="cmd-prompt">$</span> <span class="cmd-main">git clone</span> <span class="cmd-val">https://github.com/gad0lin/specter</span></div>
+      <div><span class="cmd-prompt">$</span> <span class="cmd-main">./specter.sh</span> <span class="cmd-flag">init</span></div>
+      <div><span class="cmd-prompt">$</span> <span class="cmd-main">./specter.sh</span> <span class="cmd-flag">--stack</span> <span class="cmd-val">nvidia</span> <span class="cmd-flag">--image-path</span> <span class="cmd-val">scan.jpg</span></div>
     </div>
   </div>
 </section>
@@ -708,9 +754,9 @@ footer a { color: var(--red); text-decoration: none; }
 
 <footer>
   <div>
-    <strong style="color:#888">🔮 LORE — Living Open Robotics Experience</strong><br>
+    <strong style="color:#888">🔮 SPECTER — Space Perception Engine for Crime, Theater, and Exploration Research</strong><br>
     Built at <a href="https://www.nebius.builders">Nebius.Build SF 2026</a> · SHACK15, Ferry Building<br><br>
-    <a href="https://github.com/gad0lin/lore-robot">GitHub</a> · Open Source · MIT License
+    <a href="https://github.com/gad0lin/specter">GitHub</a> · Open Source · MIT License
   </div>
 </footer>
 

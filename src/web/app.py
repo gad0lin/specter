@@ -17,7 +17,7 @@ from fastapi import FastAPI, WebSocket, WebSocketDisconnect
 from fastapi.responses import HTMLResponse, JSONResponse
 from fastapi.staticfiles import StaticFiles
 
-app = FastAPI(title="LORE — Living Open Robotics Experience")
+app = FastAPI(title="SPECTER — Space Perception Engine for Crime, Theater, and Exploration Research")
 
 
 @app.on_event("startup")

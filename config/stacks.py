@@ -9,13 +9,12 @@ import os
 
 STACKS = {
     "nvidia": {
-        "VISION_BACKEND":   "nim",           # NVIDIA NIM / Qwen2-VL-72B
-        "LLM_BACKEND":      "nebius",        # Nebius Token Factory / Llama-3.3-70B
-        "SEARCH_BACKEND":   "tavily",        # Tavily AI search
-        "TTS_BACKEND":      "riva",          # NVIDIA ACE Riva
-        "AVATAR_BACKEND":   "audio2face",    # NVIDIA ACE Audio2Face
-        "NIM_MODEL":        "Qwen/Qwen2-VL-72B-Instruct",
-        "LLM_MODEL":        "meta-llama/Llama-3.3-70B-Instruct",
+        "VISION_BACKEND":   "nim",
+        "LLM_BACKEND":      "nebius",
+        "SEARCH_BACKEND":   "tavily",
+        "TTS_BACKEND":      "minimax",
+        "NIM_MODEL":        "Qwen/Qwen2.5-VL-72B-Instruct",     # NVIDIA GPU vision
+        "LLM_MODEL":        "nvidia/Llama-3_1-Nemotron-Ultra-253B-v1",  # NVIDIA's own model
     },
     "hybrid": {
         "VISION_BACKEND":   "nim",

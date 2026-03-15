@@ -66,7 +66,48 @@ async def status():
         "robots": _robot_states,
         "clues_found": _clues_found,
         "scan_count": len(_scan_results),
+        "keys": await _check_keys(),
     }
+
+
+async def _check_keys() -> dict:
+    from config.settings import get
+    import httpx
+    results = {}
+    nebius_key = get("nebius_api_key")
+    tavily_key = get("tavily_api_key")
+
+    # Nebius
+    if nebius_key:
+        try:
+            async with httpx.AsyncClient(timeout=5) as c:
+                r = await c.post(
+                    "https://api.studio.nebius.com/v1/chat/completions",
+                    headers={"Authorization": f"Bearer {nebius_key}"},
+                    json={"model":"meta-llama/Llama-3.3-70B-Instruct","messages":[{"role":"user","content":"ping"}],"max_tokens":3},
+                )
+            results["nebius"] = "ok" if r.status_code == 200 else f"error {r.status_code}"
+        except Exception as e:
+            results["nebius"] = f"error: {e}"
+    else:
+        results["nebius"] = "missing"
+
+    # Tavily
+    if tavily_key:
+        try:
+            async with httpx.AsyncClient(timeout=5) as c:
+                r = await c.post(
+                    "https://api.tavily.com/search",
+                    headers={"Authorization": f"Bearer {tavily_key}"},
+                    json={"query":"test","max_results":1},
+                )
+            results["tavily"] = "ok" if r.status_code == 200 else f"error {r.status_code}"
+        except Exception as e:
+            results["tavily"] = f"error: {e}"
+    else:
+        results["tavily"] = "missing"
+
+    return results
 
 
 @app.get("/forensics/{case_id}")

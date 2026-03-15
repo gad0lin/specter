@@ -146,6 +146,15 @@ body { background:var(--bg); color:var(--cream); font-family:'DM Sans',system-ui
 </head>
 <body>
 
+<!-- STATUS BAR -->
+<div id="statusBar" style="background:#1a1814;color:#aaa;font-size:11px;font-family:'SF Mono','Fira Code',monospace;padding:6px 24px;display:flex;gap:20px;align-items:center">
+  <span style="color:#555">SPECTER</span>
+  <span id="sk-nebius">⬜ Nebius</span>
+  <span id="sk-tavily">⬜ Tavily</span>
+  <span id="sk-minimax">⬜ MiniMax</span>
+  <span style="margin-left:auto;color:#555" id="sk-stack">stack: —</span>
+</div>
+
 <!-- HEADER -->
 <div class="header">
   <div class="header-logo">🔮</div>
@@ -544,6 +553,27 @@ body { background:var(--bg); color:var(--cream); font-family:'DM Sans',system-ui
   };
 
   connect();
+
+  // Check key status on load
+  async function checkKeys() {
+    try {
+      const r = await fetch('/status');
+      const d = await r.json();
+      const keys = d.keys || {};
+      const set = (id, val) => {
+        const el = document.getElementById(id);
+        if (!el) return;
+        const ok = val === 'ok';
+        el.textContent = (ok ? '🟢' : '🔴') + ' ' + id.replace('sk-','');
+        el.style.color = ok ? '#22c55e' : '#ef4444';
+      };
+      set('sk-nebius', keys.nebius);
+      set('sk-tavily', keys.tavily);
+      if (keys.minimax) set('sk-minimax', keys.minimax);
+      else document.getElementById('sk-minimax').textContent = '⚪ MiniMax';
+    } catch(e) {}
+  }
+  checkKeys();
 </script>
 </body>
 </html>

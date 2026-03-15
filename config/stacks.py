@@ -10,11 +10,12 @@ import os
 STACKS = {
     "nvidia": {
         "VISION_BACKEND":   "nim",
-        "LLM_BACKEND":      "nebius",
+        "LLM_BACKEND":      "nvidia",                                    # NVIDIA NIM API directly
         "SEARCH_BACKEND":   "tavily",
         "TTS_BACKEND":      "minimax",
-        "NIM_MODEL":        "Qwen/Qwen2.5-VL-72B-Instruct",     # NVIDIA GPU vision
-        "LLM_MODEL":        "nvidia/Llama-3_1-Nemotron-Ultra-253B-v1",  # NVIDIA's own model
+        "NIM_MODEL":        "Qwen/Qwen2.5-VL-72B-Instruct",
+        "LLM_MODEL":        "nvidia/llama-3.1-nemotron-ultra-253b-v1",  # NVIDIA's 253B model
+        "LLM_BASE_URL":     "https://integrate.api.nvidia.com/v1",
     },
     "hybrid": {
         "VISION_BACKEND":   "nim",

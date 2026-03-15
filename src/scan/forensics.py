@@ -17,7 +17,7 @@ NEBIUS_API_KEY = os.environ.get("NEBIUS_API_KEY", "")
 TAVILY_API_KEY = os.environ.get("TAVILY_API_KEY", "")
 NIM_MODEL = os.environ.get("NIM_MODEL", "Qwen/Qwen2-VL-72B-Instruct")
 LLM_MODEL = os.environ.get("LLM_MODEL", "meta-llama/Llama-3.3-70B-Instruct")
-NEBIUS_BASE_URL = "https://api.studio.nebius.com/v1"
+from src.story.llm_client import get_client as _get_llm_client
 
 FORENSICS_SCAN_PROMPT = """You are a forensic AI assistant documenting a scene for law enforcement.
 Analyze this image with maximum detail and return a structured JSON report:

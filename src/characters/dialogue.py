@@ -16,7 +16,7 @@ from src.story.generator import Character, StoryWorld
 
 NEBIUS_API_KEY = os.environ.get("NEBIUS_API_KEY", "")
 LLM_MODEL = os.environ.get("LLM_MODEL", "meta-llama/Llama-3.3-70B-Instruct")
-NEBIUS_BASE_URL = "https://api.studio.nebius.com/v1"
+from src.story.llm_client import get_client as _get_llm_client
 
 
 def _client() -> OpenAI:

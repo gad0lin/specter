@@ -14,7 +14,7 @@ from openai import OpenAI
 
 NEBIUS_API_KEY = os.environ.get("NEBIUS_API_KEY", "")
 LLM_MODEL = os.environ.get("LLM_MODEL", "meta-llama/Llama-3.3-70B-Instruct")
-NEBIUS_BASE_URL = "https://api.studio.nebius.com/v1"
+from src.story.llm_client import get_client as _get_llm_client
 
 SHERLOCK_SYSTEM = """You are the story director for an immersive Sherlock Holmes mystery experience.
 The mystery is set in a REAL physical space — a modern hackathon venue.
@@ -173,7 +173,7 @@ Number of robots: {num_robots}"""
     )
 
     print(f"🔍 Generating Sherlock mystery via Nebius ({LLM_MODEL})...")
-    client = OpenAI(base_url=NEBIUS_BASE_URL, api_key=NEBIUS_API_KEY)
+    client, LLM_MODEL = _get_llm_client()
 
     resp = client.chat.completions.create(
         model=LLM_MODEL,
@@ -251,7 +251,7 @@ Respond in 2-3 sentences maximum. Make every word count.
     messages.extend(history[-6:])
     messages.append({"role": "user", "content": watson_message})
 
-    client = OpenAI(base_url=NEBIUS_BASE_URL, api_key=NEBIUS_API_KEY)
+    client, LLM_MODEL = _get_llm_client()
     resp = client.chat.completions.create(
         model=LLM_MODEL,
         messages=messages,

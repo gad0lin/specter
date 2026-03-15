@@ -54,6 +54,19 @@ async def broadcast(msg: dict):
 TEMPLATE = Path(__file__).parent / "templates" / "index.html"
 
 
+@app.get("/favicon.ico")
+async def favicon():
+    # SVG eye icon as favicon
+    svg = '''<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 96 96">
+      <rect width="96" height="96" fill="#1a1814" rx="16"/>
+      <path d="M12 48 C24 24 72 24 84 48 C72 72 24 72 12 48Z" stroke="white" stroke-width="2.5" fill="none"/>
+      <circle cx="48" cy="48" r="14" stroke="white" stroke-width="2.5" fill="none"/>
+      <circle cx="48" cy="48" r="5" fill="white"/>
+    </svg>'''
+    from fastapi.responses import Response
+    return Response(content=svg, media_type="image/svg+xml")
+
+
 @app.get("/", response_class=HTMLResponse)
 async def dashboard():
     return TEMPLATE.read_text()
